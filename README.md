@@ -1,7 +1,5 @@
 # INTRODUCTION
-This Evan, welcome!!!
-Flo
-Bonsoir
+
 This is a JAVA framework for the Traveling Salesman Problem (TSP).
 
 This framework was created by Fabien Léhuédé, Damien Prot and Axel Grimault for pedagogic issues at [Institut Mines Télécom Atlantique](https://www.imt-atlantique.fr/).
@@ -27,6 +25,7 @@ Follow these steps :
 
 Run a java application. You must specify arguments.
 **Run**: `-help` for help.
+Exemple : -v -g  -t 1 instances/d198.tsp
 
 ### Command line
 
