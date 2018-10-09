@@ -1,6 +1,8 @@
 package tsp;
 
 import tsp.heuristic.AHeuristicBasic;
+import tsp.metaheuristic.AMetaheuristic;
+import tsp.metaheuristic.AMetaheuristicGenetique;
 
 /**
  * 
@@ -76,11 +78,11 @@ public class TSPSolver {
 		// Example of a time loop
 		long startTime = System.currentTimeMillis();
 		long spentTime = 0;
-		AHeuristicBasic modele = new AHeuristicBasic(this.m_instance, "Basic");
-		
+		//AHeuristicBasic modele = new AHeuristicBasic(this.m_instance, "Basic");
+		AMetaheuristicGenetique modele = new AMetaheuristicGenetique(this.m_instance, "Genetique");
 		do
 		{
-			modele.solve();
+			modele.solve(null);
 			//AHeuristicBasic modele = new AHeuristicBasic(this.m_instance, "Basic");
 			
 			// TODO
