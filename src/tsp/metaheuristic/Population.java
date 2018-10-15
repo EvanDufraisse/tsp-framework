@@ -78,7 +78,9 @@ public class Population {
 			this.population.add(i, pop.population.get(i));
 		}
 	}
-	
+	public ArrayList<Individu> get() {
+		return this.population;
+	}
 	/**
 	 * 
 	 * @param nbIndividusSelectionnes le nombre d'individus que l'on veut croiser entre eux
@@ -89,8 +91,9 @@ public class Population {
 		this.trier(instance);
 		ArrayList<Individu> selection = new ArrayList<Individu>();
 		for(int i = 0; i < nbIndividusSelectionnes; i++) {
-			selection.add(this.population.get(i).croiser(this.population.get(i+1)));
-			selection.add(this.population.get(i+1).croiser(this.population.get(i)));
+			
+			selection.add(this.population.get(2*i).croiser(this.population.get(2*i+1)));
+			selection.add(this.population.get(2*i+1).croiser(this.population.get(2*i)));
 		}
 		
 		return new Population(selection, nbIndividusSelectionnes);

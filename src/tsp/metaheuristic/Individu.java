@@ -14,7 +14,7 @@ public class Individu {
 	
 	public Individu(int n, boolean individuVide) {
 		this.size = n;
-		this.individu = new int[n];
+		this.individu = new int[n+1];
 		
 	}
 	
@@ -22,8 +22,12 @@ public class Individu {
 	public Individu(int n) {
 		// TODO Auto-generated constructor stub
 		this.size = n;
-		this.individu = individuAleatoire(this.size);
+		this.individu = individuAleatoire(this.size).getIndividu();
 		
+	}
+	public Individu(int n, int[] individu) {
+		this.individu = individu;
+		this.size = n;
 	}
 	
 	
@@ -75,7 +79,7 @@ public class Individu {
 		int nbElementsAjoutes = (int)(n/2);
 		//int i = (int)(n/2) - 1;
 		int i = 0;
-		System.out.println();
+		
 		while(nbElementsAjoutes < n) {
 			if(!fils.contains(parent2.get(i))) {
 				fils.set(nbElementsAjoutes, parent2.get(i));
@@ -86,7 +90,7 @@ public class Individu {
 	
 		}
 		
-		
+		//System.out.println(fils.ecrire());
 		return fils;
 	}
 	
@@ -112,40 +116,54 @@ public class Individu {
 	 * 
 	 * @return individu solution aléatoirement choisi
 	 */
-	public int[] individuAleatoire(int n) {
+	public Individu individuAleatoire(int n) {
 		
-		int[] individu = new int[n];
+		int[] individuAlea = new int[n + 1];
 		
 		for(int i = 0; i < n; i++) {
-			individu[i] = i + 1;
+			individuAlea[i] = i;
+			
 		}
-		
+		individuAlea[n] = 0;
+		//System.out.println(new Individu(n, individuAlea).ecrire());
 		int j = 0;
 		
-		for(int i = n - 1; i >=0 ; i-- ) {
+		for(int i = n - 1; i >=1 ; i-- ) {
 			Random rand = new Random();
-			j = rand.nextInt(i - 0 + 1);
-			swap(individu, i, j);
+			j = rand.nextInt(i)+1;
+			swap(individuAlea, i, j);
 		}
-		System.out.println("ok");
-		return individu;
+		//System.out.println(new Individu(n, individuAlea).ecrire());
+		
+		return new Individu(n, individuAlea);
 	}
 	
 	public double getLongueur(Instance instance) throws Exception {
 		
 		double longueur = 0;
 		
-		for(int i = 0; i < this.size - 1; i++) {
-			longueur += instance.getDistances(i, i+1);
+		for(int i = 0; i < this.size-1; i++) {
+			longueur += instance.getDistances(this.getIndividu()[i], this.getIndividu()[i + 1]);
 		}
 		return longueur;
 	}
-	public String toString() {
+	public String ecrire() {
 		String s = "";
 		for(int i = 0; i < this.size; i++) {
 			s += " " + this.individu[i] + " ";
 		}
+		
 		return s;
+	}
+	public int getMax() {
+		int max = 0;
+		for (int i = 0; i < this.getIndividu().length; i++) {
+			if(this.getIndividu()[i] > max) {
+				max = this.getIndividu()[i];
+			}
+		}
+		
+		return max;
 	}
 
 }
