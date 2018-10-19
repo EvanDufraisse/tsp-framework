@@ -155,7 +155,7 @@ public class Main {
 
 			// If verbose, print the solution
 			if (verbose) {
-				data.print(System.err);
+				//data.print(System.err);
 				tsp.getSolution().print(System.err);
 				if (e == 1)
 					System.err.println("Error: There is an error in the solution: " + tsp.getSolution().getError());

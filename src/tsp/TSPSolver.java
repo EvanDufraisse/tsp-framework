@@ -3,6 +3,7 @@ package tsp;
 import tsp.heuristic.AHeuristicBasic;
 import tsp.metaheuristic.AMetaheuristic;
 import tsp.metaheuristic.AMetaheuristicGenetique;
+import tsp.metaheuristic.Individu;
 
 /**
  * 
@@ -79,17 +80,35 @@ public class TSPSolver {
 		long startTime = System.currentTimeMillis();
 		long spentTime = 0;
 		//AHeuristicBasic modele = new AHeuristicBasic(this.m_instance, "Basic");
-		AMetaheuristicGenetique modele = new AMetaheuristicGenetique(this.m_instance, "Genetique");
-		do
-		{
-			modele.solve(null);
-			//AHeuristicBasic modele = new AHeuristicBasic(this.m_instance, "Basic");
+		AMetaheuristicGenetique modele = new AMetaheuristicGenetique(this.m_instance, "Genetique", 100, 200);
+		Individu aComparer = new Individu(this.m_instance.getNbCities(), true, this.m_instance);
+		Solution s = new Solution(this.m_instance);
+		int j = 0;
+		
+		do{
 			
+
+			
+			s = modele.solve(null);
+			//System.out.println("ok");
+			
+			if(j%80 == 0) {
+				System.out.println(modele.getBest().getLongueur());
+			}
+			j++;
 			// TODO
 			// Code a loop base on time here
 			spentTime = System.currentTimeMillis() - startTime;
 		}while(spentTime < (m_timeLimit * 1000 - 100) );
-		this.m_solution = modele.getSolution();
+		/**for(int i = 0; i < this.m_instance.getNbCities(); i++) {
+			aComparer.set(i, this.m_solution.getCity(i));
+		}*/
+		for(int i = 0; i < this.m_instance.getNbCities(); i++) {
+			this.m_solution.setCityPosition(i, s.getCity(i));
+		}
+		System.out.println(modele.getLongueur(0) + ", " + modele.getLongueur(1) + ", " + modele.getLongueur(3));
+		
+		
 	}
 
 	// -----------------------------

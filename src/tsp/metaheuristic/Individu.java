@@ -11,30 +11,76 @@ public class Individu {
 
 	private int[] individu;
 	private int size;
+	private double longueur;
+	private Instance instance;
 	
-	public Individu(int n, boolean individuVide) {
+	public Individu(int n, boolean individuVide, Instance instance) {
 		this.size = n;
 		this.individu = new int[n+1];
-		
+		this.instance = instance;
 	}
 	
 	
-	public Individu(int n) {
+	public Individu(int n, Instance instance) {
 		// TODO Auto-generated constructor stub
 		this.size = n;
 		this.individu = individuAleatoire(this.size).getIndividu();
+		this.instance = instance;
 		
 	}
-	public Individu(int n, int[] individu) {
+	public Individu(int n, int[] individu, Instance instance) {
 		this.individu = individu;
 		this.size = n;
+		this.instance = instance;
+	}
+
+	public Individu(Individu ind) {
+		this.individu = ind.getIndividu().clone();
+		int n = ind.getSize();
+		this.individu = new int[ind.getSize() + 1];
+		int[] tableau = ind.getIndividu();
+		for(int i = 0; i < n; i ++) {
+			this.individu[i] = tableau[i];
+		}
+		this.size = ind.getSize();
+		this.longueur = ind.getLongueur();
+		this.instance = ind.getInstance();
 	}
 	
+	
+	public void muter() throws Exception {
+		
+		double p_mutation = 0.1; // la probabilité de mutation d'un individu
+		//int proportion_mutation = (int)(this.size/20); //la proportion d'alleles que l'on mute
+		int proportion_mutation = 3;
+		boolean estMute = false;
+		if(Math.random() < p_mutation) {
+			estMute = true;
+			for(int i = 0; i < proportion_mutation; i++) {
+				swap(this.individu, randomWithRange(1, this.size - 1), randomWithRange(1, this.size - 1)); //On echange des ville aleatoirement choisies (sauf la premiere)
+			}
+			this.opt_2(instance);
+			this.setLongueur();
+		}
+		
+		
+		
+	}
 	
 	public int[] getIndividu() {
 		return this.individu;
 				
 	}
+	
+	
+	
+	
+	int randomWithRange(int min, int max)
+	{
+	   double range = Math.abs(max - min);     
+	   return (int)(Math.random() * range) + (min <= max ? min : max);
+	}
+	
 	public int getSize() {
 		return this.size;
 	}
@@ -43,6 +89,9 @@ public class Individu {
 	}
 	public int get(int i) {
 		return this.individu[i];
+	}
+	public Instance getInstance() {
+		return this.instance;
 	}
 	public boolean contains(int elt) {
 	
@@ -62,14 +111,15 @@ public class Individu {
 	 * suivant.
 	 * @param parent2 l'individu avec lequel on croise l'individu sur lequel on applique croiser
 	 * @return un individu issu du croisement des deux parents
+	 * @throws Exception 
 	 */
-	public Individu croiser (Individu parent2){
+	public Individu croiser (Individu parent2) throws Exception {
 		
 		int n = this.getSize();
 		//System.out.println("n = " + n);
 		//System.out.println("size = " + this.individu.length);
 		//System.out.println("Taille parent2 = " + parent2.getSize());
-		Individu fils = new Individu(n, true);
+		Individu fils = new Individu(n, true, this.instance);
 		//System.out.println("Taille fils = " + fils.getSize());
 		for(int i = 0; i < (int)(n/2); i++) {
 			fils.set(i, parent2.get(i));
@@ -89,11 +139,28 @@ public class Individu {
 			i++;
 	
 		}
+		fils.setLongueur();
 		
 		//System.out.println(fils.ecrire());
 		return fils;
 	}
-	
+	public void opt_2(Instance instance) throws Exception {
+		int n = this.getSize();
+		for(int i = 1; i < n-1; i++) {
+			for(int j = 1; j < i-1; j++) {
+				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(i+1), this.get(j+1))) {
+					swap(this.individu, i+1, j);
+				}
+			}
+			for(int j = i + 2; j < n-1; j++) {
+				
+				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(i+1), this.get(j+1))) {
+					swap(this.individu, i+1, j);
+				}
+			}
+		}
+		this.setLongueur();
+	}
 	
 	/**
 	 * Echange les elements de a situés aux places i et j
@@ -135,18 +202,26 @@ public class Individu {
 		}
 		//System.out.println(new Individu(n, individuAlea).ecrire());
 		
-		return new Individu(n, individuAlea);
+		return new Individu(n, individuAlea, this.instance);
 	}
 	
-	public double getLongueur(Instance instance) throws Exception {
+	public void setLongueur() throws Exception {
 		
-		double longueur = 0;
+		double longueurTemp = 0;
 		
-		for(int i = 0; i < this.size-1; i++) {
-			longueur += instance.getDistances(this.getIndividu()[i], this.getIndividu()[i + 1]);
+		for(int i = 0; i < this.size; i++) {
+			longueurTemp += this.instance.getDistances(this.getIndividu()[i], this.getIndividu()[i + 1]);
 		}
-		return longueur;
+		this.longueur = longueurTemp;
 	}
+	public void setLongueur(double lon) {
+		this.longueur = lon;
+	}
+	
+	public double getLongueur() {
+		return this.longueur;
+	}
+	
 	public String ecrire() {
 		String s = "";
 		for(int i = 0; i < this.size; i++) {
