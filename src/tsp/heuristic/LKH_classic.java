@@ -11,47 +11,57 @@ import tsp.Instance;
  */
 public class LKH_classic extends AHeuristic{
 
-/** The m 1 tree. */
-/*VARIABLES DINSTANCES########################################################################################################*/
-public int[][] m_1_Tree; /*m_1_Tree est un tableau binaire de taille n*n avec m_1_Tree[i][j] == 1 si la liaison 
-i----j apartient à l'arbre et 0 sinon */
 
-/** The m topological prec spanning tree. */
- public List<Integer> m_topological_prec_spanning_tree;/*Cette variable d'instance permet de connaitre l'ordre dans lequel
-les villes ont été ajoutée au Spanning-Tree, arbre qui précède la création du 1-Tree, ceci est utile pour calculer
-m_alpha_nearness et m_dad ultérieurement */
+/*#########################################################################################################################*/
+/*-----------------------------------------------VARIABLES DINSTANCES--------------------------------------------------------------*/
+/*#########################################################################################################################*/	
+public int[][] m_1_Tree;
+/*m_1_Tree est un tableau binaire de taille n*n avec m_1_Tree[i][j] == 1 si la liaison 
+i----j apartient Ã  l'arbre et 0 sinon */
 
-/** The m dad. */
-public int[] m_dad;/*m_dad est une liste qui indique par m_dad[City1] la ville parent de City1 dans le Spanning-Tree*/
+ public List<Integer> m_topological_prec_spanning_tree;
+/*Cette variable d'instance permet de connaitre l'ordre dans lequel
+les villes ont Ã©tÃ© ajoutÃ©e au Spanning-Tree, arbre qui prÃ©cÃ¨de la crÃ©ation du 1-Tree, ceci est utile pour calculer
+m_alpha_nearness et m_dad ultÃ©rieurement */
 
-/** The m special node. */
-public int m_special_node;/*Il s'agit du noeud "spécial" qui permet de former le 1-Tree à partir du Spanning-Tree*/
 
-/** The m alpha nearness. */
-public long[][] m_alpha_nearness; /*Il s'agit d'une distance non euclidienne qui permet de savoir quels sont les 
-noeuds les plus probablement reliés ensemble*/
+public int[] m_dad;
+/*m_dad est une liste qui indique par m_dad[City1] la ville parent de City1 dans le Spanning-Tree*/
 
-/** The alpha candidates. */
- int[][] alpha_candidates;/*Il s'agit d'un tableau extrait de m_alpha_nearness de taille n*K ou K désigne 
-le nombre de meilleurs candidats que l'on souhaite garder par noeud, on prend généralement K=5 */
 
-/** The m path. */
-public int[]  m_path; /* Il s'agit du chemin parcouru avec la même norme que m_cities de la classe solution, on 
+public int m_special_node;
+/*Il s'agit du noeud "spÃ©cial" qui permet de former le 1-Tree Ã  partir du Spanning-Tree*/
+
+
+public long[][] m_alpha_nearness; 
+/*Il s'agit d'une distance non euclidienne qui permet de savoir quels sont les 
+noeuds les plus probablement reliÃ©s ensemble*/
+
+
+ int[][] alpha_candidates;
+/*Il s'agit d'un tableau extrait de m_alpha_nearness de taille n*K ou K dÃ©signe 
+le nombre de meilleurs candidats que l'on souhaite garder par noeud, on prend gÃ©nÃ©ralement K=5 */
+
+
+public int[]  m_path; 
+/* Il s'agit du chemin parcouru avec la mÃªme norme que m_cities de la classe solution, on 
 recopie directement m_path dans m_cities */
 
-/** The m successor. */
- public int[] m_successor;/*m_successor[City1] == City2 veut dire que dans le chemin actuel City1 précède City2*/
 
-/** The m predecessor. */
-public int[] m_predecessor;/*m_predecessor[City1] == City2 veut dire que dans le chemin actuel City1 succède à City2*/
+ public int[] m_successor;
+/*m_successor[City1] == City2 veut dire que dans le chemin actuel City1 prÃ©cÃ¨de City2*/
 
-/** The m path indexed by cities. */
-public int[] m_path_indexed_by_cities;/** The m euclidean candidates. */
+
+public int[] m_predecessor;
+/*m_predecessor[City1] == City2 veut dire que dans le chemin actuel City1 succÃ¨de Ã  City2*/
+
+
+public int[] m_path_indexed_by_cities;
 /*m_path_indexed_by_cities[City1] == i veut dire que City1 est la 
-i+1ème ville visitée pour le chemin actuel*/
+i+1Ã¨me ville visitÃ©e pour le chemin actuel*/
+	
 public int[][] m_euclidean_candidates;
 
-/** The m K permutation. */
 public int[][] m_K_permutation;
 
 /*#########################################################################################################################*/
@@ -59,7 +69,7 @@ public int[][] m_K_permutation;
 /*#########################################################################################################################*/
 
 /**
- * Ce constructeur prend en entrée l'instance et construit toutes les variables d'instances nécessaires au problème*.
+ * Ce constructeur prend en entrÃ©e l'instance et construit toutes les variables d'instances nÃ©cessaires au problÃ¨me*.
  *
  * @param instance the instance
  * @param name the name
@@ -90,13 +100,13 @@ public LKH_classic(Instance instance, String name) throws Exception {
 /*----------------------------------------------------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------------------------------------------------*/
 /**
- * PrimAlgorithm est basé sur l'algorithme de PRIM pour former un Minimum Spanning-Tree et au final un 1-Tree.
- * Le 1-Tree est stocké sous forme d'une matrice carré binaire this.m_1_Tree où this.m_1_Tree[i][j]==1 veut dire
- * que les villes i et j sont reliées.
+ * PrimAlgorithm est basÃ© sur l'algorithme de PRIM pour former un Minimum Spanning-Tree et au final un 1-Tree.
+ * Le 1-Tree est stockÃ© sous forme d'une matrice carrÃ© binaire this.m_1_Tree oÃ¹ this.m_1_Tree[i][j]==1 veut dire
+ * que les villes i et j sont reliÃ©es.
  * STEP#1 On construit un minimum spanning-tree avec toutes les villes sauf une au choix.
- * STEP#2 A partir de cette dernière ville non reliée , on construit les deux segmentsqui forment
+ * STEP#2 A partir de cette derniÃ¨re ville non reliÃ©e , on construit les deux segmentsqui forment
  * les deux distances minimum avec le spanning Tree.
- * La valeur objective this.ObjectiveValue() de ce graphe permet d'obtenir une borne inférieure du problème du TSP.
+ * La valeur objective this.ObjectiveValue() de ce graphe permet d'obtenir une borne infÃ©rieure du problÃ¨me du TSP.
  * @throws Exception the exception
  */
 
@@ -106,20 +116,20 @@ public void PrimAlgorithm() throws Exception {
 		return; //Impossible de former un 1-tree avec 0 villes
 	}
 	else {
-		List<Integer> mstlist = new ArrayList<Integer>(); //Liste contenant les villes déjà ajoutée au spanning-tree
-		List<Integer> cityLeft = new ArrayList<Integer>();//Liste contenant les villes restantes à ajouter
-		for(int i=1; i<n;i++) {//on ajoute toutes les villes à la liste à l'exception de 0
+		List<Integer> mstlist = new ArrayList<Integer>(); //Liste contenant les villes dÃ©jÃ  ajoutÃ©e au spanning-tree
+		List<Integer> cityLeft = new ArrayList<Integer>();//Liste contenant les villes restantes Ã  ajouter
+		for(int i=1; i<n;i++) {//on ajoute toutes les villes Ã  la liste Ã  l'exception de 0
 			cityLeft.add(i);
 		}
-		mstlist.add(0); //0 est considéré comme déjà traité, choix arbitraire pratique
+		mstlist.add(0); //0 est considÃ©rÃ© comme dÃ©jÃ  traitÃ©, choix arbitraire pratique
 		while(mstlist.size()<n) {
 		long d= Long.MAX_VALUE;
 		int i=-1;
 		int j=-1;
-		for(int k : mstlist) { //On parcourt toutes les villes déjà traitées
+		for(int k : mstlist) { //On parcourt toutes les villes dÃ©jÃ  traitÃ©es
 			for(int l : cityLeft) {
 				long dprime=this.m_instance.getDistances(k, l); /**On compare leurs distances avec toutes les villes
-				non traitées*/
+				non traitÃ©es*/
 				if(d>dprime) {
 					d=dprime;
 					i=k;
@@ -130,14 +140,14 @@ public void PrimAlgorithm() throws Exception {
 		}
 		mstlist.add(j); //On ajoute la ville la plus proche du spanning-tree au spanning-tree
 		this.m_1_Tree[i][j]=1;
-		cityLeft.remove((Object)j); //On enlève la ville de la liste des villes à traiter
+		cityLeft.remove((Object)j); //On enlÃ¨ve la ville de la liste des villes Ã  traiter
 		this.m_1_Tree[j][i]=1;
 		
 		}
 		
 		
 		this.m_topological_prec_spanning_tree=mstlist;
-		//Création de this.m_dad
+		//CrÃ©ation de this.m_dad
 				int[] tab = new int[n];
 				tab[0]=-1;
 				for(int i = 1; i<n; i++) {
@@ -151,7 +161,7 @@ public void PrimAlgorithm() throws Exception {
 				}
 				////System.out.println(Arrays.deepToString(this.m_1_Tree));
 				this.m_dad=tab;
-		//Détermination du segment pour le plus long second plus proche voisin
+		//DÃ©termination du segment pour le plus long second plus proche voisin
 		long[][] tab2 = new long[n][2];
 		for(int i = 0; i<n; i++) {
 			long d=Long.MAX_VALUE;
@@ -185,8 +195,8 @@ public void PrimAlgorithm() throws Exception {
 /**
  * Beta nearness.
  *Le calcul de la "Beta nearness" est intermediaire au calcul de "l'alpha nearness".
- *La matrice beta retournée donne la longueur beta[i][j] de la liaison minimal à casser
- *pour conserver un 1-Tree après la création de la liaison entre la ville i et j.
+ *La matrice beta retournÃ©e donne la longueur beta[i][j] de la liaison minimal Ã  casser
+ *pour conserver un 1-Tree aprÃ¨s la crÃ©ation de la liaison entre la ville i et j.
  * @return the long[][]
  * @throws Exception the exception
  */
@@ -230,11 +240,11 @@ public long[][] beta_nearness() throws Exception {
 
 /**
  * One tree optimisation.
- *Si tous les noeuds de notre 1-Tree sont de degrés 2 alors nous avons un cycle minimal et le problème est résolu.
- *On essaie d'optimiser le 1-Tree en "éloignant" virtuellement les villes de degrés trop haut et en rapprochant celle de
- *degrés trop bas. On re-calcule le 1-Tree avec les nouvelles distances à l'aide de PrimAlgorithm2 qui fonctionne selon le
- *même principe que PrimAlgorithm mais avec des distances virtuellement modifiés par el vecteur pi[].
- *L'optimisation s'arrête selon des critères empiriques. 
+ *Si tous les noeuds de notre 1-Tree sont de degrÃ©s 2 alors nous avons un cycle minimal et le problÃ¨me est rÃ©solu.
+ *On essaie d'optimiser le 1-Tree en "Ã©loignant" virtuellement les villes de degrÃ©s trop haut et en rapprochant celle de
+ *degrÃ©s trop bas. On re-calcule le 1-Tree avec les nouvelles distances Ã  l'aide de PrimAlgorithm2 qui fonctionne selon le
+ *mÃªme principe que PrimAlgorithm mais avec des distances virtuellement modifiÃ©s par el vecteur pi[].
+ *L'optimisation s'arrÃªte selon des critÃ¨res empiriques. 
  * @throws Exception the exception
  */
 public void OneTreeOptimisation() throws Exception {
@@ -243,7 +253,7 @@ public void OneTreeOptimisation() throws Exception {
 	long[] v2 = new long[n];
 	long[] pi = new long[n];
 	int c = 0;
-	double t =100; // peut etre changer t au profit d'un compromis avec les distances du problème
+	double t =100; // peut etre changer t au profit d'un compromis avec les distances du problÃ¨me
 	for(int i=0; i<n; i++) { //peut etre faire une fonction de copie des vecteurs
 		v1[i]=this.degree(i)-2;
 		v2[i]=v1[i];
@@ -257,7 +267,7 @@ public void OneTreeOptimisation() throws Exception {
 	for(int p=0; p<period; p++) {
 		if(objectiveValue1==objectiveValue2) {
 		t=t*2;
-		//System.out.println("ça commence");
+		//System.out.println("Ã§a commence");
 		}
 		else {
 			objectiveValue1=-1;
@@ -300,8 +310,8 @@ public void OneTreeOptimisation() throws Exception {
 
 /**
  * Alpha nearness.
- *L'alpha nearness se calcule à partir de la beta nearness et correspond au coût d'ajout de la liaison i--j 
- *dans le 1-Tree. Plus cette valeur est grande moins l'on considère la laiison comme probable par la suite.
+ *L'alpha nearness se calcule Ã  partir de la beta nearness et correspond au coÃ»t d'ajout de la liaison i--j 
+ *dans le 1-Tree. Plus cette valeur est grande moins l'on considÃ¨re la laiison comme probable par la suite.
  * @return the long[][]
  * @throws Exception the exception
  */
@@ -326,10 +336,10 @@ public long[][] alpha_nearness() throws Exception{
 
 /**
  * First tour construction.
- *Pour chaque ville on possède par ordre décroissant de probabilité (selon le critère d'alpha nearness) les villes auquelles
- *elle pourrait être reliée. On construit un premier tour en prenant la ville la plus probable encore disponible.
- *Le résultat est meilleur qu'un résultat aléatoire et qu'un "plus proche voisin" et peu coûteux puisque le calcul
- *des candidats doit être fait pour l'amélioration ultérieure du tour.
+ *Pour chaque ville on possÃ¨de par ordre dÃ©croissant de probabilitÃ© (selon le critÃ¨re d'alpha nearness) les villes auquelles
+ *elle pourrait Ãªtre reliÃ©e. On construit un premier tour en prenant la ville la plus probable encore disponible.
+ *Le rÃ©sultat est meilleur qu'un rÃ©sultat alÃ©atoire et qu'un "plus proche voisin" et peu coÃ»teux puisque le calcul
+ *des candidats doit Ãªtre fait pour l'amÃ©lioration ultÃ©rieure du tour.
  * @param candidates the candidates
  * @return the int[]
  * @throws Exception the exception
@@ -379,7 +389,7 @@ public int[] FirstTourConstruction(int[][] candidates) throws Exception {
 
 /**
  * Path indexed by cities.
- *Liste indexée par numéro de ville, this.m_path_indexed_by_cities[i] donne le rang auquel on visite la ième ville
+ *Liste indexÃ©e par numÃ©ro de ville, this.m_path_indexed_by_cities[i] donne le rang auquel on visite la iÃ¨me ville
  *sur le chemin.
  * @return the int[]
  */
@@ -400,7 +410,7 @@ public int[] pathIndexedByCities() {
 /**
  * Predecessor.
  *this.m_predecessor[i] donne le predecesseur de la ville i sur le chemin parcouru.
- *remarque: le predecesseur de la première ville visitée est la dernière ville visitée.
+ *remarque: le predecesseur de la premiÃ¨re ville visitÃ©e est la derniÃ¨re ville visitÃ©e.
  * @return the int[]
  */
 public int[] predecessor() {
@@ -422,7 +432,7 @@ public int[] predecessor() {
 /**
  * Successor.
  * *this.m_successor[i] donne le successeur de la ville i sur le chemin parcouru.
- *remarque: le successeur de la dernière ville visitée est la première ville visitée.
+ *remarque: le successeur de la derniÃ¨re ville visitÃ©e est la premiÃ¨re ville visitÃ©e.
  * @return the int[]
  */
 public int[] successor() {
@@ -992,20 +1002,20 @@ public void PrimAlgorithm2(long[] pi) throws Exception {
 		return; //Impossible de former un 1-tree avec 0 villes
 	}
 	else {
-		List<Integer> mstlist = new ArrayList<Integer>(); //Liste contenant les villes déjà ajoutée au spanning-tree
-		List<Integer> cityLeft = new ArrayList<Integer>();//Liste contenant les villes restantes à ajouter
-		for(int i=1; i<n;i++) {//on ajoute toutes les villes à la liste à l'exception de 0
+		List<Integer> mstlist = new ArrayList<Integer>(); //Liste contenant les villes dÃ©jÃ  ajoutÃ©e au spanning-tree
+		List<Integer> cityLeft = new ArrayList<Integer>();//Liste contenant les villes restantes Ã  ajouter
+		for(int i=1; i<n;i++) {//on ajoute toutes les villes Ã  la liste Ã  l'exception de 0
 			cityLeft.add(i);
 		}
-		mstlist.add(0); //0 est considéré comme déjà traité, choix arbitraire pratique
+		mstlist.add(0); //0 est considÃ©rÃ© comme dÃ©jÃ  traitÃ©, choix arbitraire pratique
 		while(mstlist.size()<n) {
 		long d= Long.MAX_VALUE;
 		int i=-1;
 		int j=-1;
-		for(int k : mstlist) { //On parcourt toutes les villes déjà traitées
+		for(int k : mstlist) { //On parcourt toutes les villes dÃ©jÃ  traitÃ©es
 			for(int l : cityLeft) {
 				long dprime=resolution*this.m_instance.getDistances(k, l) + pi[k] + pi[l]; /**On compare leurs distances avec toutes les villes
-				non traitées*/
+				non traitÃ©es*/
 				if(d>dprime) {
 					d=dprime;
 					i=k;
@@ -1017,14 +1027,14 @@ public void PrimAlgorithm2(long[] pi) throws Exception {
 		}
 		mstlist.add(j); //On ajoute la ville la plus proche du spanning-tree au spanning-tree
 		this.m_1_Tree[i][j]=1;
-		cityLeft.remove((Object)j); //On enlève la ville de la liste des villes à traiter
+		cityLeft.remove((Object)j); //On enlÃ¨ve la ville de la liste des villes Ã  traiter
 		this.m_1_Tree[j][i]=1;
 		
 		}
 		
 		
 		this.m_topological_prec_spanning_tree=mstlist;
-		//Création de this.m_dad
+		//CrÃ©ation de this.m_dad
 				int[] tab = new int[n];
 				tab[0]=-1;
 				for(int i = 1; i<n; i++) {
@@ -1038,7 +1048,7 @@ public void PrimAlgorithm2(long[] pi) throws Exception {
 				}
 				////System.out.println(Arrays.deepToString(this.m_1_Tree));
 				this.m_dad=tab;
-		//Détermination du segment pour le plus long second plus proche voisin
+		//DÃ©termination du segment pour le plus long second plus proche voisin
 		long[][] tab2 = new long[n][2];
 		for(int i = 0; i<n; i++) {
 			long d=Long.MAX_VALUE;
