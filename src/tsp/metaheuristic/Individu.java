@@ -21,11 +21,12 @@ public class Individu {
 	}
 	
 	
-	public Individu(int n, Instance instance) {
+	public Individu(int n, Instance instance) throws Exception {
 		// TODO Auto-generated constructor stub
 		this.size = n;
 		this.individu = individuAleatoire(this.size).getIndividu();
 		this.instance = instance;
+		this.setLongueur();
 		
 	}
 	public Individu(int n, int[] individu, Instance instance) {
@@ -50,19 +51,18 @@ public class Individu {
 	
 	public void muter() throws Exception {
 		
-		double p_mutation = 0.1; // la probabilité de mutation d'un individu
+		double p_mutation = 0.15; // la probabilité de mutation d'un individu
 		//int proportion_mutation = (int)(this.size/20); //la proportion d'alleles que l'on mute
-		int proportion_mutation = 3;
-		boolean estMute = false;
+		int proportion_mutation = randomWithRange(1, 3);
+		
 		if(Math.random() < p_mutation) {
-			estMute = true;
+		
 			for(int i = 0; i < proportion_mutation; i++) {
 				swap(this.individu, randomWithRange(1, this.size - 1), randomWithRange(1, this.size - 1)); //On echange des ville aleatoirement choisies (sauf la premiere)
 			}
 			this.opt_2(instance);
 			this.setLongueur();
 		}
-		
 		
 		
 	}
@@ -116,18 +116,14 @@ public class Individu {
 	public Individu croiser (Individu parent2) throws Exception {
 		
 		int n = this.getSize();
-		//System.out.println("n = " + n);
-		//System.out.println("size = " + this.individu.length);
-		//System.out.println("Taille parent2 = " + parent2.getSize());
+
 		Individu fils = new Individu(n, true, this.instance);
-		//System.out.println("Taille fils = " + fils.getSize());
+		
 		for(int i = 0; i < (int)(n/2); i++) {
-			fils.set(i, parent2.get(i));
+			fils.set(i, this.get(i));
 		}
 		
-		//System.out.println("n/2 = " + (int)(n/2));
 		int nbElementsAjoutes = (int)(n/2);
-		//int i = (int)(n/2) - 1;
 		int i = 0;
 		
 		while(nbElementsAjoutes < n) {
@@ -146,21 +142,28 @@ public class Individu {
 	}
 	public void opt_2(Instance instance) throws Exception {
 		int n = this.getSize();
+		
 		for(int i = 1; i < n-1; i++) {
 			for(int j = 1; j < i-1; j++) {
-				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(i+1), this.get(j+1))) {
-					swap(this.individu, i+1, j);
+				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(j+1), this.get(i+1))) {
+					this.swapEdges(i, j);
+					
 				}
 			}
 			for(int j = i + 2; j < n-1; j++) {
 				
-				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(i+1), this.get(j+1))) {
-					swap(this.individu, i+1, j);
+				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(j+1), this.get(i+1))) {
+					
+					this.swapEdges(i, j);
+					
 				}
 			}
 		}
+		
 		this.setLongueur();
+		
 	}
+	
 	
 	/**
 	 * Echange les elements de a situés aux places i et j
@@ -173,8 +176,25 @@ public class Individu {
 		  a[i] = a[j];
 		  a[j] = t;
 		}
-	
-	
+	/**
+	 * Echange les segments [i; i + 1] et [j; j + 1]
+	 * @param i une ville du parcours
+	 * @param j une ville du parcours
+	 */
+	public void swapEdges(int i, int j) {
+		
+		int nbSwaps = (int)((j - i + 1)/2); //Nombre de swaps effectués
+		
+		for(int ind = 0; ind < nbSwaps; ind++) {
+			swap(this.getIndividu(), i + 1 + ind, j - ind);
+		}
+		
+	}
+	public void swapInd(int i, int j) {
+		int t = this.individu[i];
+		this.individu[i] = this.individu[j];
+		this.individu[j] = t;
+	}
 	
 	/**
 	 * Créé un individu aléatoire (c'est-à-dire un tableau d'entiers

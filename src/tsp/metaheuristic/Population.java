@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.sun.tools.javac.util.List;
+
 import tsp.Instance;
 
 
@@ -14,7 +16,7 @@ public class Population {
 	private int nbIndividus;
 	private Instance instance;
 	
-	public Population(int nbIndividus, int nbVilles, Instance instance) {
+	public Population(int nbIndividus, int nbVilles, Instance instance) throws Exception {
 		
 		this.nbIndividus = nbIndividus;
 		this.population = new ArrayList<Individu>();
@@ -38,6 +40,9 @@ public class Population {
 	}
 	public int getNbIndividus() {
 		return this.nbIndividus;
+	}
+	public ArrayList<Individu> getPopulation(){
+		return this.population;
 	}
 	
 	public void trier() {
@@ -81,62 +86,64 @@ public class Population {
 
 }
 	public void fusionner(Population pop, Instance instance) throws Exception {
-		double longueur = 0;
-		double longueurMax = this.population.get(this.getNbIndividus() - 1).getLongueur();
-		for(int i = 0; i < pop.getNbIndividus(); i++) {
-			longueur = pop.population.get(i).getLongueur();
-			if(longueur  <  longueurMax) {
-				//pop.opt2(instance);
+		
+		int n = pop.getNbIndividus();
+		for(int i = 0; i < n; i++) {
 				
-				
-				this.inserer(pop.population.get(i), instance);
-			}
-			//this.population.add(pop.population.get(i));
+				this.inserer(pop.get(i), instance);
+			
+				//this.population.add(pop.population.get(i));
 		}
+		//this.trier();
 	}
 	public void inserer(Individu ind, Instance instance) throws Exception {
 		int i = 0;
 		double l = ind.getLongueur();
 		
-		while(i < this.population.size() && l > this.population.get(i).getLongueur()) {
+		while(i < this.nbIndividus && l > this.get(i).getLongueur()) {
 			i++;
 		}
-		this.population.set(i, ind);
+		//this.population.set(i, ind);
+		this.population.add(i, ind);
+		this.population.remove(this.nbIndividus);
 	}
 	public void muter(Instance instance) throws Exception {
 		int n = this.population.size();
 		Individu mutant;
 		for(int i = 0; i < n; i++) {
-			
+			///*
 			mutant = new Individu(this.get(i).getSize(), this.get(i).getIndividu().clone(), instance);
-			mutant.setLongueur();
-			if(mutant.muter()) {
-				mutant.opt_2(instance);
+			mutant.setLongueur(this.get(i).getLongueur());
+			mutant.muter();
+			
+			
+			if(mutant.getLongueur() < this.population.get(i).getLongueur()) {
+				this.getPopulation().set(i, mutant);
+				
 			}
-			
-			//mutant.opt_2(instance);
-			this.inserer(mutant, instance);*/
-			
-			this.population.get(i).muter();
-			//this.inserer(this.population.get(i), instance);
-		
 			//this.inserer(mutant, instance);
-			//this.population.get(i).opt_2(instance);
+			
 		}
 	}
 	
+	
+	
+	
 	public void selectionner() {
 		
-		int n = this.population.size();
-		while(n < this.population.size()){
-			this.population.remove(n);
+		
+		while(this.nbIndividus < this.population.size()){
+			this.population.remove(this.population.size()-1);
 		}
 	}
 	
 	public void opt2(Instance instance) throws Exception {
-		for(int i = 1; i < this.nbIndividus; i++) {
-			this.population.get(i).opt_2(instance);
+		int n = this.nbIndividus;
+		//n = (int)(this.nbIndividus/10);
+		for(int i = 2; i < n; i++) {
+			this.get(i).opt_2(instance);
 		}
+		this.trier();
 	}
 	
 	public ArrayList<Individu> get() {
@@ -150,15 +157,56 @@ public class Population {
 	 * @throws Exception 
 	 */
 	public Population selectionnerCroiser(int nbIndividusSelectionnes, Instance instance) throws Exception {
-		this.trier();
+		//this.trier();
 		ArrayList<Individu> selection = new ArrayList<Individu>();
 		for(int i = 0; i < nbIndividusSelectionnes; i++) {
 			
-			selection.add(this.population.get(2*i).croiser(this.population.get(2*i+1)));
-			selection.add(this.population.get(2*i+1).croiser(this.population.get(2*i)));
+			selection.add(this.population.get(i).croiser(this.population.get(i+1)));
+			//selection.add(this.population.get(2*i+1).croiser(this.population.get(2*i)));
 		}
 		
 		return new Population(selection, nbIndividusSelectionnes, this.instance);
 			
 		}
+	public Population selectionAleatoireCroiser(int nbIndividusSelectionnes) throws Exception {
+		
+		ArrayList<Individu> selection = new ArrayList<Individu>();
+		int indiceA = 0;
+		int indiceB = 0;
+		for(int i = 0; i < nbIndividusSelectionnes; i++) {
+			indiceA = randomWithRange(0, this.getNbIndividus() - 1);
+			indiceB = randomWithRange(0, this.getNbIndividus() - 1);
+			selection.add(this.population.get(indiceA).croiser(this.population.get(indiceB)));
+			//selection.add(this.population.get(indiceB).croiser(this.population.get(indiceA)));
+		}
+		return new Population(selection, nbIndividusSelectionnes, this.instance);
+		
+		
+		
+	}
+	public void enleverDoublons() throws Exception {
+	
+		for(int i = 0; i < this.nbIndividus; i++) {
+			for(int j = i+1; j < this.nbIndividus; j++) {
+				if(this.get(i).getLongueur() == this.get(j).getLongueur()) {
+					this.population.set(j, new Individu(this.get(j).getSize(), this.instance));
+				}
+			}
+			
+		}
+		this.trier();
+	}
+		int randomWithRange(int min, int max)
+	{
+	   double range = Math.abs(max - min);     
+	   return (int)(Math.random() * range) + (min <= max ? min : max);
+	}
+	public String toString() {
+		int n = this.population.size();
+		String s = "[";
+		for(int i = 0; i < n; i ++) {
+			s += this.get(i).getLongueur() + " ,";
+		}
+		return s + "fin";
+	}
 }
