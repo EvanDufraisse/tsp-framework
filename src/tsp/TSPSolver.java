@@ -87,7 +87,7 @@ public class TSPSolver {
 		
 		do{
 			
-
+ 
 			
 			s = modele.solve(null);
 			//System.out.println("ok");
