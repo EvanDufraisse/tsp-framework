@@ -85,44 +85,77 @@ public class Population {
 	
 
 }
-	public void fusionner(Population pop, Instance instance) throws Exception {
+	/**
+	 * Insère chacun des individus dans la population this, de telle manière que this garde la même taille, et que la population résultante soit meilleure. On insère donc
+	 * seulement les individus dont la longueur est inférieure à celle de l'individu ayant la plus grande.
+	 * @param pop La population à fusionner avec this
+	 * @throws Exception
+	 */
+	public void fusionner(Population pop) throws Exception {
 		
 		int n = pop.getNbIndividus();
+		int start = 0;
 		for(int i = 0; i < n; i++) {
 				
-				this.inserer(pop.get(i), instance);
-			
-				//this.population.add(pop.population.get(i));
-		}
-		//this.trier();
-	}
-	public void inserer(Individu ind, Instance instance) throws Exception {
-		int i = 0;
-		double l = ind.getLongueur();
+				start = this.inserer(pop.get(i), start);
 		
-		while(i < this.nbIndividus && l > this.get(i).getLongueur()) {
-			i++;
 		}
-		//this.population.set(i, ind);
-		this.population.add(i, ind);
-		this.population.remove(this.nbIndividus);
+
 	}
-	public void muter(Instance instance) throws Exception {
+	/**
+	 * Insère ind dans this, de telle manière à garder un ordre croissant de longueur dans le tableau this.population, et seulement si sa longueur est inférieure à la pire de la population.
+	 * @param ind l'individu que l'on veut insérer dans this
+	 * @throws Exception
+	 */
+	public void inserer(Individu ind) throws Exception {
+		
+			this.inserer(ind, 0);
+	}
+	
+	/**
+	 * Insère ind dans this, de telle manière à garder un ordre croissant de longueur dans le tableau this.population, et seulement si sa longueur est inférieure à la pire de la population.
+	 * @param ind l'individu que l'on veut insérer dans this
+	 * @throws Exception
+	 */
+	public int inserer(Individu ind, int start) throws Exception{
+		
+		if(ind.getLongueur() < this.get(this.nbIndividus - 1).getLongueur()) { //On insère ind seulement si cela résulte en une amélioration de la population.
+					
+					int i = start;
+					double l = ind.getLongueur();
+				
+					while(i < this.nbIndividus && l > this.get(i).getLongueur()) {
+						i++;
+					}
+			
+					this.population.add(i, ind);
+					this.population.remove(this.nbIndividus); //On enlève le dernier individu si on a inséré ind pour garder une taille de population constante.
+					return i;
+				}
+		else {
+			return 0;
+		}
+	}
+	/**
+	 * Mute chacun des individus de this, avec une certaine probabilité, contenue dans Individu.muter()
+	 * @throws Exception
+	 */
+	public void muter() throws Exception {
+		
 		int n = this.population.size();
 		Individu mutant;
+		
 		for(int i = 0; i < n; i++) {
-			///*
-			mutant = new Individu(this.get(i).getSize(), this.get(i).getIndividu().clone(), instance);
+			
+			mutant = new Individu(this.get(i).getSize(), this.get(i).getIndividu().clone(), this.instance);
 			mutant.setLongueur(this.get(i).getLongueur());
-			mutant.muter();
+			//mutant.muter();
+			mutant.RMSMutation();
 			
 			
 			if(mutant.getLongueur() < this.population.get(i).getLongueur()) {
 				this.getPopulation().set(i, mutant);
-				
-			}
-			//this.inserer(mutant, instance);
-			
+				}
 		}
 	}
 	
@@ -137,15 +170,22 @@ public class Population {
 		}
 	}
 	
-	public void opt2(Instance instance) throws Exception {
+	/**
+	 * Applique l'heuristique 2-opt à tous les individus
+	 * @throws Exception
+	 */
+	public void opt2() throws Exception {
 		int n = this.nbIndividus;
-		//n = (int)(this.nbIndividus/10);
+		
 		for(int i = 2; i < n; i++) {
-			this.get(i).opt_2(instance);
+			this.get(i).opt_2(this.instance);
 		}
 		this.trier();
 	}
-	
+	/**
+	 * 
+	 * @return le tableau des individus de this
+	 */
 	public ArrayList<Individu> get() {
 		return this.population;
 	}
@@ -187,10 +227,12 @@ public class Population {
 	public void enleverDoublons() throws Exception {
 	
 		for(int i = 0; i < this.nbIndividus; i++) {
-			for(int j = i+1; j < this.nbIndividus; j++) {
-				if(this.get(i).getLongueur() == this.get(j).getLongueur()) {
+			int j = i + 1;
+			while(j < this.nbIndividus && this.get(i).getLongueur() == this.get(j).getLongueur()) {
+			
+		
 					this.population.set(j, new Individu(this.get(j).getSize(), this.instance));
-				}
+					j++;
 			}
 			
 		}

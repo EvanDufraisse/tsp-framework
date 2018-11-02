@@ -61,20 +61,21 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 		
 		//System.out.println("Selection :" + (System.currentTimeMillis()-startTime));
 		startTime = System.currentTimeMillis();
-		this.population.muter(this.m_instance);
+		this.population.muter();
 		//System.out.println("Mutation : " + (System.currentTimeMillis()-startTime));
 		startTime = System.currentTimeMillis();
 		
 		//System.out.println("Fusion : " + (System.currentTimeMillis()-startTime));
 		startTime = System.currentTimeMillis();
 		this.population.trier();
-		this.population.fusionner(this.populationSelectionnee, this.m_instance);
+		this.populationSelectionnee.trier();
+		this.population.fusionner(this.populationSelectionnee);
 		
-		this.population.selectionner();
+	//	this.population.selectionner();
 		//System.out.println("Tri : " + (System.currentTimeMillis()-startTime));
 		startTime = System.currentTimeMillis();
 		if(this.iteration%15 == 0) {
-			this.population.opt2(this.m_instance);
+			this.population.opt2();
 		}
 		
 		this.iteration ++;
@@ -85,7 +86,7 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 		}
 		this.population.enleverDoublons();
 	
-		if(this.iteration%100 == 0) {
+		if(this.iteration%10 == 0) {
 			System.out.println(this.population.toString());
 
 			

@@ -60,11 +60,35 @@ public class Individu {
 			for(int i = 0; i < proportion_mutation; i++) {
 				swap(this.individu, randomWithRange(1, this.size - 1), randomWithRange(1, this.size - 1)); //On echange des ville aleatoirement choisies (sauf la premiere)
 			}
-			this.opt_2(instance);
-			this.setLongueur();
+			this.opt_2(this.instance);
+			//this.setLongueur();
 		}
 		
 		
+	}
+	
+	public void RMSMutation() throws Exception{
+		double p_mutation = 0.05;
+		
+		if(Math.random() < p_mutation) {
+			
+			int a = randomWithRange(1, this.size - 1);
+			int b = randomWithRange(1, this.size - 1);
+			
+			if(b < a) {
+				int t = a;
+				a = b;
+				b = t;
+			}
+			
+			while(a < b) {
+				this.swapInd(a, b);
+				a++;
+				b--;
+			}
+				
+		}
+		this.opt_2(this.instance);
 	}
 	
 	public int[] getIndividu() {
@@ -186,7 +210,8 @@ public class Individu {
 		}
 		//System.out.println("-----------------------------");
 		try {
-			fils.setLongueur();
+			fils.opt_2(this.instance);
+			//fils.setLongueur();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
