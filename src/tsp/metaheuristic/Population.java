@@ -161,7 +161,7 @@ public class Population {
 		ArrayList<Individu> selection = new ArrayList<Individu>();
 		for(int i = 0; i < nbIndividusSelectionnes; i++) {
 			
-			selection.add(this.population.get(i).croiser(this.population.get(i+1)));
+			selection.add(this.population.get(i).OXCrossover(this.population.get(i+1)));
 			//selection.add(this.population.get(2*i+1).croiser(this.population.get(2*i)));
 		}
 		
@@ -176,7 +176,7 @@ public class Population {
 		for(int i = 0; i < nbIndividusSelectionnes; i++) {
 			indiceA = randomWithRange(0, this.getNbIndividus() - 1);
 			indiceB = randomWithRange(0, this.getNbIndividus() - 1);
-			selection.add(this.population.get(indiceA).croiser(this.population.get(indiceB)));
+			selection.add(this.population.get(indiceA).OXCrossover(this.population.get(indiceB)));
 			//selection.add(this.population.get(indiceB).croiser(this.population.get(indiceA)));
 		}
 		return new Population(selection, nbIndividusSelectionnes, this.instance);

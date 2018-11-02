@@ -53,7 +53,7 @@ public class Individu {
 		
 		double p_mutation = 0.15; // la probabilité de mutation d'un individu
 		//int proportion_mutation = (int)(this.size/20); //la proportion d'alleles que l'on mute
-		int proportion_mutation = randomWithRange(1, 3);
+		int proportion_mutation = randomWithRange(1, 5);
 		
 		if(Math.random() < p_mutation) {
 		
@@ -140,17 +140,71 @@ public class Individu {
 		//System.out.println(fils.ecrire());
 		return fils;
 	}
+	public Individu OXCrossover(Individu parent2) {
+		
+		int n = this.getSize();
+		Individu fils = new Individu(n, true, this.instance);
+		//System.out.println("parent 1 :" + this.ecrire());
+		//System.out.println("parent 2 :" + parent2.ecrire());
+		int x = 1;
+		int y = 0;
+		
+		while(y <= x) {
+			x = randomWithRange(1, n);
+			y = randomWithRange(1, n);
+		}
+		//System.out.println(x);
+		//System.out.println(y);
+		
+		for(int i = x; i <= y; i++) {
+			fils.set(i, this.get(i));
+		}
+		//System.out.println("fils : " + fils.ecrire());
+		int nbElementsAjoutesAGauche = 1;
+		int i = 1;
+		
+		while(nbElementsAjoutesAGauche < x ) {
+			if(!fils.contains(parent2.get(i))) {
+				fils.set(nbElementsAjoutesAGauche, parent2.get(i));
+				nbElementsAjoutesAGauche++;
+				//System.out.println("fils : " + fils.ecrire());
+			}
+			i++;
+			
+		}
+		//System.out.println("i = " + i);
+		int nbElementsAjoutesADroite = 0;
+		int j = y + 1;
+		
+		while(nbElementsAjoutesADroite < n - y - 1) {
+			if(!fils.contains(parent2.get(i))) {
+				fils.set(j + nbElementsAjoutesADroite, parent2.get(i));
+				nbElementsAjoutesADroite ++;
+				//System.out.println("fils : " + fils.ecrire());
+			}
+			i++;
+		}
+		//System.out.println("-----------------------------");
+		try {
+			fils.setLongueur();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return fils;
+	}
 	public void opt_2(Instance instance) throws Exception {
 		int n = this.getSize();
 		
-		for(int i = 1; i < n-1; i++) {
+		for(int i = 0; i < n-1; i++) {
 			for(int j = 1; j < i-1; j++) {
 				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(j+1), this.get(i+1))) {
 					this.swapEdges(i, j);
 					
 				}
 			}
-			for(int j = i + 2; j < n-1; j++) {
+			for(int j = i + 2; j < n; j++) {
 				
 				if(this.instance.getDistances(this.get(i), this.get(i+1)) + this.instance.getDistances(this.get(j), this.get(j + 1)) > this.instance.getDistances(this.get(i), this.get(j)) + this.instance.getDistances(this.get(j+1), this.get(i+1))) {
 					
@@ -244,7 +298,7 @@ public class Individu {
 	
 	public String ecrire() {
 		String s = "";
-		for(int i = 0; i < this.size; i++) {
+		for(int i = 0; i <= this.size; i++) {
 			s += " " + this.individu[i] + " ";
 		}
 		

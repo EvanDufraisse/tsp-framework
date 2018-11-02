@@ -81,16 +81,14 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 		if(this.best.getLongueur() > this.population.get(0).getLongueur()) {
 			this.best = this.population.get(0);
 			
-			//this.best.opt_2(m_instance);
+			
 		}
 		this.population.enleverDoublons();
-		
+	
 		if(this.iteration%100 == 0) {
 			System.out.println(this.population.toString());
-			//System.out.println(this.iteration);
-			if(this.population.get(2).equals(this.population.get(3))) {
-				System.out.println("erreur !");
-			}
+
+			
 		}
 		
 		//System.out.println("Best : " + (System.currentTimeMillis()-startTime));

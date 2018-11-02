@@ -90,10 +90,10 @@ public class TSPSolver {
  
 			
 			s = modele.solve(null);
-			//System.out.println("ok");
+		
 			
 			if(spentTime%1000 <= 15) {
-				System.out.println(modele.getBest().getLongueur());
+				//System.out.println(modele.getBest().getLongueur());
 				//System.out.println(modele.getLongueur(0) + ", " + modele.getLongueur(1) + ", " + modele.getLongueur(3));
 			}
 			j++;
