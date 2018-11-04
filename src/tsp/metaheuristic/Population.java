@@ -140,7 +140,7 @@ public class Population {
 	 * Mute chacun des individus de this, avec une certaine probabilité, contenue dans Individu.muter()
 	 * @throws Exception
 	 */
-	public void muter() throws Exception {
+	public void muter(double p_mutation) throws Exception {
 		
 		int n = this.population.size();
 		Individu mutant;
@@ -150,7 +150,7 @@ public class Population {
 			mutant = new Individu(this.get(i).getSize(), this.get(i).getIndividu().clone(), this.instance);
 			mutant.setLongueur(this.get(i).getLongueur());
 			//mutant.muter();
-			mutant.RMSMutation();
+			mutant.RMSMutation(p_mutation);
 			
 			
 			if(mutant.getLongueur() < this.population.get(i).getLongueur()) {

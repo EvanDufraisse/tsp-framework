@@ -48,6 +48,13 @@ EDGE_WEIGHT_TYPE : EUC_2D
 objectiveValue 	0
 0-0-0-0-0-0-0-0-0-0-0
 #### END SOLUTION ####
+java.lang.ArrayIndexOutOfBoundsException: 11
+	at tsp.metaheuristic.Individu.get(Individu.java:116)
+	at tsp.metaheuristic.Individu.OXCrossover(Individu.java:205)
+	at tsp.metaheuristic.Population.selectionnerCroiser(Population.java:204)
+	at tsp.metaheuristic.AMetaheuristicGenetiqueParallel.solve(AMetaheuristicGenetiqueParallel.java:80)
+	at tsp.metaheuristic.AMetaheuristicGenetiqueParallel.run(AMetaheuristicGenetiqueParallel.java:44)
+	at java.lang.Thread.run(Thread.java:748)
 NAME : eil51
 COMMENT : 51-city problem (Christofides/Eilon)
 TYPE : TSP

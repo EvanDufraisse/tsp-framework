@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import tsp.Instance;
+import tsp.Solution;
 
 public class Individu {
 
@@ -67,8 +68,8 @@ public class Individu {
 		
 	}
 	
-	public void RMSMutation() throws Exception{
-		double p_mutation = 0.05;
+	public void RMSMutation(double p_mutation) throws Exception{
+		
 		
 		if(Math.random() < p_mutation) {
 			
@@ -338,6 +339,16 @@ public class Individu {
 		}
 		
 		return max;
+	}
+	public Solution toSolution() throws Exception {
+		
+	Solution solution = new Solution(this.instance);
+			
+			for(int i = 0; i < this.instance.getNbCities(); i++) {
+				solution.setCityPosition(i, this.individu[i]);
+			}
+			return solution;
+		
 	}
 
 }

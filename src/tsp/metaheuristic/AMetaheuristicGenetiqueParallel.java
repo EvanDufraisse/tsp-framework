@@ -2,13 +2,10 @@ package tsp.metaheuristic;
 
 import tsp.Instance;
 import tsp.Solution;
-import tsp.metaheuristic.Individu;
 
-import java.util.concurrent.ThreadLocalRandom;
+public class AMetaheuristicGenetiqueParallel extends AMetaheuristic implements Runnable{
 
-//import com.sun.deploy.util.SystemPropertyUtil;
 
-public class AMetaheuristicGenetique extends AMetaheuristic {
 	
 	private int nbSelections;
 	private int taillePopulation;
@@ -16,10 +13,14 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 	private Population populationSelectionnee;
 	private Individu best;
 	private int iteration;
+	private volatile boolean running;
+	private Sync syncFrom;
+	private Sync syncTo;
+	private Best meilleur;
 	private double p_mutation;
 
 	
-	public AMetaheuristicGenetique(Instance instance, String name, int nbSelections, int taillePopulation, double p_mutation) throws Exception {
+	public AMetaheuristicGenetiqueParallel(Instance instance, String name, int nbSelections, int taillePopulation, double p_mutation, Sync syncFrom, Sync syncTo, Best meilleur) throws Exception {
 		super(instance, name);
 		this.nbSelections = nbSelections;
 		this.taillePopulation = taillePopulation;
@@ -27,9 +28,31 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 		this.populationSelectionnee = new Population(this.nbSelections, this.m_instance.getNbCities(), this.m_instance);
 		this.best = this.population.get(0);
 		this.iteration = 0;		
+		this.running = true;
+		this.syncFrom = syncFrom;
+		this.syncTo = syncTo;
+		this.meilleur = meilleur;
 		this.p_mutation = p_mutation;
+
 	}
 	
+	@Override
+	public void run() {
+	
+		while(running) {
+			try {
+				this.solve(null);
+			} catch (Exception e) {
+			
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public void arreter() {
+		this.running = false;
+	}
 	
 	public double getLongueur(int i) throws Exception {
 		return this.population.get(i).getLongueur();
@@ -46,62 +69,79 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 	}
 	
 		
-	public Individu getBest() {
+	public synchronized Individu getBest() {
 		return this.best;
 	}
 	
 
 	@Override
 	public Solution solve(Solution sol) throws Exception {
-		// TODO Auto-generated method stub
-	
-		long startTime = System.currentTimeMillis();
 	
 		this.populationSelectionnee = this.population.selectionnerCroiser(this.nbSelections, this.m_instance);
-		//this.populationSelectionnee = this.population.selectionAleatoireCroiser(this.nbSelections);
 		
-		//System.out.println("Selection :" + (System.currentTimeMillis()-startTime));
-		startTime = System.currentTimeMillis();
+	
 		this.population.muter(this.p_mutation);
-		//System.out.println("Mutation : " + (System.currentTimeMillis()-startTime));
-		startTime = System.currentTimeMillis();
 		
-		//System.out.println("Fusion : " + (System.currentTimeMillis()-startTime));
-		startTime = System.currentTimeMillis();
+
 		this.population.trier();
 		this.populationSelectionnee.trier();
 		this.population.fusionner(this.populationSelectionnee);
 		
-	//	this.population.selectionner();
-		//System.out.println("Tri : " + (System.currentTimeMillis()-startTime));
-		startTime = System.currentTimeMillis();
+	
 		if(this.iteration%15 == 0) {
 			this.population.opt2();
 		}
 		
 		this.iteration ++;
+		
 		if(this.best.getLongueur() > this.population.get(0).getLongueur()) {
 			this.best = this.population.get(0);
-			
-			
+			this.meilleur.set(this.best);
+			//System.out.println("best : " + this.best.getLongueur());
 		}
 		this.population.enleverDoublons();
 	
-		if(this.iteration%10 == 0) {
+		if(this.iteration%100 == -1) {
 			System.out.println(this.population.toString());
-
+			
 			
 		}
+		if(this.iteration%15 == 0) {
+			this.migrer();
+			this.recuperer();
+		}
 		
-		//System.out.println("Best : " + (System.currentTimeMillis()-startTime));
 		
-		/*Individu ind = new Individu(this.m_instance.getNbCities(), this.m_instance);
-		ind.opt_2(this.m_instance);
-		if(ind.getLongueur() < this.getBest().getLongueur()) {
-			this.best = ind;
-		}*/
-
 		return this.getSolution();
 	}
+
+	public void migrer() {
+		
+		Individu[] aMigrer = new Individu[this.syncTo.getSize()];
+		
+		for(int i = 0; i < this.syncTo.getSize(); i++) {
+			aMigrer[i] = this.population.get(i);
+		}
+		
+		try {
+			this.syncTo.put(aMigrer);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+	}
+	
+	public void recuperer() throws Exception {
+		
+		
+			Individu[] recu = this.syncFrom.get();
+	
+		
+		for(int i = 0; i < this.syncFrom.getSize(); i++) {
+			this.population.inserer(recu[i]);
+		}
+		
+	}
+	
 
 }

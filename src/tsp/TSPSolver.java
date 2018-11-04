@@ -3,7 +3,10 @@ package tsp;
 import tsp.heuristic.AHeuristicBasic;
 import tsp.metaheuristic.AMetaheuristic;
 import tsp.metaheuristic.AMetaheuristicGenetique;
+import tsp.metaheuristic.AMetaheuristicGenetiqueParallel;
+import tsp.metaheuristic.Best;
 import tsp.metaheuristic.Individu;
+import tsp.metaheuristic.Sync;
 
 /**
  * 
@@ -80,16 +83,61 @@ public class TSPSolver {
 		long startTime = System.currentTimeMillis();
 		long spentTime = 0;
 		//AHeuristicBasic modele = new AHeuristicBasic(this.m_instance, "Basic");
-		AMetaheuristicGenetique modele = new AMetaheuristicGenetique(this.m_instance, "Genetique", 20, 100);
+		
+		
+		
+		
+		
+		/*AMetaheuristicGenetique modele = new AMetaheuristicGenetique(this.m_instance, "Genetique", 20, 100);
 		Individu aComparer = new Individu(this.m_instance.getNbCities(), true, this.m_instance);
 		Solution s = new Solution(this.m_instance);
-		int j = 0;
+		int j = 0;*/
 		
+		//*Multi-thread
+		System.out.println("ok");  
+		int cores = Runtime.getRuntime().availableProcessors()-1;
+		System.out.println("" + cores);
+		int taillePopulationEchange = 6;
+		int nbSelections = 10;
+		int taillePopulation = 20;
+		Best best = new Best();
+		
+		double[] p_mutation = new double[cores];
+		for(int i = 0; i < cores; i++) {
+			p_mutation[i] = 0.05 + ((0.2 - 0.05)/cores) * i;
+		}
+		
+		
+		
+		
+		AMetaheuristicGenetiqueParallel[] island = new AMetaheuristicGenetiqueParallel[cores];
+		Sync[] stockage = new Sync[cores];
+		Thread[] listeThreads = new Thread[cores];
+		
+		
+		
+		stockage[0] = new Sync(taillePopulationEchange);
+		
+		for(int i = 0; i < cores - 1; i++){
+		
+			stockage[i + 1] = new Sync(taillePopulationEchange);
+			island[i] = new AMetaheuristicGenetiqueParallel(this.m_instance, "Modele insulaire", nbSelections, taillePopulation, p_mutation[i], stockage[i], stockage[i+1], best);
+			listeThreads[i] = new Thread(island[i]);
+			
+		}
+		System.out.println("ok");
+		 island[cores - 1] = new AMetaheuristicGenetiqueParallel(this.m_instance, "Modele insulaire", nbSelections, taillePopulation, p_mutation[cores - 1], stockage[cores - 1], stockage[0], best);
+		listeThreads[cores - 1] = new Thread(island[cores - 1]);
+		for(int i = 0; i < cores; i++) {
+			
+			listeThreads[i].start();
+			
+		}
+		 
+		 
 		do{
 			
- 
-			
-			s = modele.solve(null);
+			/*s = modele.solve(null);
 		
 			
 			if(spentTime%1000 <= 15) {
@@ -97,17 +145,45 @@ public class TSPSolver {
 				//System.out.println(modele.getLongueur(0) + ", " + modele.getLongueur(1) + ", " + modele.getLongueur(3));
 			}
 			j++;
-			// TODO
-			// Code a loop base on time here
+			*/
+			
+			
+			//Multi-Thread
+			
+			
+			
+			/*if(best.get() != null) {
+				this.m_solution = best.get().toSolution();
+				//System.out.println("solution : " + best.get().getLongueur());
+				//this.m_solution.evaluate();
+				//System.out.println("solution :" + this.m_solution.getObjectiveValue());
+			}*/
+			
+		
+		
+		
 			spentTime = System.currentTimeMillis() - startTime;
 		}while(spentTime < (m_timeLimit * 1000 - 100) );
-		/**for(int i = 0; i < this.m_instance.getNbCities(); i++) {
-			aComparer.set(i, this.m_solution.getCity(i));
-		}*/
+		
+		
+		Solution s = best.get().toSolution();
+		
+
 		for(int i = 0; i < this.m_instance.getNbCities(); i++) {
 			this.m_solution.setCityPosition(i, s.getCity(i));
 		}
-
+		//this.m_solution = best.get().toSolution();
+		
+		/*for(int i = 0; i < this.m_instance.getNbCities(); i++) {
+			this.m_solution.setCityPosition(i, island[0].getBest().get(i));
+		}*/
+		for(int i = 0; i < cores; i++) {
+			island[i].arreter();
+		}
+		
+		
+		
+		
 		
 		
 	}
