@@ -60,6 +60,10 @@ import tsp.Instance;
 	public int nbCandidates;
 	/** The all_alpha_candidates */
 	public int[][] all_alpha_candidates;
+	
+	
+	/**Boolean qui permet de dire si l'on souhaite l'optimisation après l'éxecution du lkh*/
+	public boolean OptimisationPost; 
 	/*#########################################################################################################################*/
 	/*-----------------------------------------------CONSTRUCTEUR & INITIALISATION---------------------------------------------*/
 	/*----------------------------------------------(PREMIERE PARTIE DE L'ALGORITHME)------------------------------------------*/
@@ -86,7 +90,10 @@ import tsp.Instance;
 		this.predecessor();//Détermine this.m_predecessor à partir du nouveau tour
 		this.successor();//Détermine this.m_successor à partir du nouveau tour
 		this.pathIndexedByCities();//Détermine this.m_path_indexed_by_cities à partir du nouveau tour
-		//this.m_K_permutation=kPermutation();//Enregistre un ensemble de permutations
+		this.OptimisationPost = false;
+		if(this.OptimisationPost) {
+		this.m_K_permutation=kPermutation();//Enregistre un ensemble de permutations
+		}
 		
 	}
 	/*----------------------------------------------------------------------------------------------------------------------*/
@@ -494,6 +501,13 @@ import tsp.Instance;
 		}
 		return this.m_path_indexed_by_cities;
 	}
+	
+	public int[] pathIndexedByCities(int index1, int index2) {
+		for(int i=index1;i<index2+1; i++) {
+			this.m_path_indexed_by_cities[this.m_path[i]]=i;
+		}
+		return this.m_path_indexed_by_cities;
+	}
 
 	//#####-2-#### Liste du predecesseur de chaque ville
 
@@ -513,6 +527,13 @@ import tsp.Instance;
 		return this.m_predecessor;
 			
 	}
+	public int[] predecessor(int index1, int index2) {
+		for(int k=index1; k<index2+2;k++ ) {
+			this.m_predecessor[this.m_path[k]]=this.m_path[k-1];
+		}
+		return this.m_predecessor;
+			
+	}
 
 	//#####-3-#### Liste du successeur de chaque ville
 	/**
@@ -526,6 +547,13 @@ import tsp.Instance;
 		this.m_successor=new int[n];
 		this.m_successor[0]=this.m_path[1];
 		for(int k=0; k<n;k++ ) {
+			this.m_successor[this.m_path[k]]=this.m_path[k+1];
+		}
+		return this.m_successor;
+			
+	}
+	public int[] successor(int index1, int index2) {
+		for(int k=index1-1; k<index2+1;k++ ) {
 			this.m_successor[this.m_path[k]]=this.m_path[k+1];
 		}
 		return this.m_successor;
@@ -666,11 +694,17 @@ import tsp.Instance;
 		int n = this.m_instance.getNbCities();
 		long startTime = System.currentTimeMillis();
 		int[][] tab = this.alpha_candidates;
-		for(int k=0; k<1;k++) {
+		int limit=1;
+	
+		if(this.OptimisationPost) {
+			limit=2;
+		}
+		for(int k=0; k<limit;k++) {
 		boolean FourOpt= false;
 		boolean FiveOpt= false;
 		long length=this.objectiveValuePath()+1;
 		while(FourOpt==false||FiveOpt==false||length!=this.objectiveValuePath()) {
+			
 			if(length==this.objectiveValuePath()) {
 				if(FourOpt==false) {
 				FourOpt=true;
@@ -683,12 +717,20 @@ import tsp.Instance;
 		for(int t1=0;t1<n;t1++) {
 				this.lkhMove(t1,FourOpt,FiveOpt,tab);
 			}
-			
+		if(this.m_instance.getNbCities()<20 && FourOpt==true) {
+			break;
+		}
 			}
+		if(this.m_instance.getNbCities()>20) {
 
-		//tab=this.euclideanCandidatesGenerator();
+		if(this.OptimisationPost) {tab=this.euclideanCandidatesGenerator();
+		}
+		}
 			
 		}
+		if(this.m_instance.getNbCities()>10 && this.OptimisationPost) {
+		this.successor();
+		this.pathIndexedByCities();
 		for(int w = 0; w<this.m_instance.getNbCities()-11; w++) {
 			if(System.currentTimeMillis() - startTime>57000) {
 				for(int i=0; i<this.m_path.length;i++) {
@@ -696,8 +738,10 @@ import tsp.Instance;
 						}
 				return;
 			}
-			//this.permutationOpti(this.m_path[w]);
-		}
+			
+			this.permutationOpti(this.m_path[w]);
+			
+		}}
 		for(int w = 0; w<this.m_instance.getNbCities(); w++) {
 			if(System.currentTimeMillis() - startTime>57000) {
 				for(int i=0; i<this.m_path.length;i++) {
@@ -847,35 +891,24 @@ import tsp.Instance;
 	int last = (this.m_path_indexed_by_cities[i]<this.m_path_indexed_by_cities[j])? j : i;
 	int index1 = this.m_path_indexed_by_cities[first];
 	int index2 = this.m_path_indexed_by_cities[last];
-	int w= index2 - index1+1;
-	int[] temp = new int[w];
-	for(int g =0; g<w; g++) {
-		temp[g]=this.m_path[index2-g];
-	}
-	if(first!=0) {
-	for(int k = 0; k<w;k++) {
-		this.m_path[k+index1]=temp[k];
-	}}
-	else{
-		int n=this.m_path.length;
-		int[] temp2 = new int[n];
-		temp2[0]=0;
-		for(int h1= w; h1<n-1;h1++) {
-			temp2[h1-w+1]=this.m_path[h1];
+	if(index1!=0 && index2!=0) {
+		int nbSwaps = (int)((this.m_path_indexed_by_cities[last]-this.m_path_indexed_by_cities[first]+1)/2);
+		int indexfirst=this.m_path_indexed_by_cities[first];
+		int indexlast=this.m_path_indexed_by_cities[last];
+		for(int w=0; w<nbSwaps; w++) {
+			int a = this.m_path[indexfirst+w];
+			this.m_path[indexfirst+w]=this.m_path[indexlast-w];
+			this.m_path[indexlast-w]=a;
 		}
-		temp2[n-w]=temp[0];
-		temp2[n-1]=temp[w-1];
-		for(int h2=1; h2<w-1;h2++) {
-			temp2[n-w+h2]=temp[w-h2-1];
-			
-		}
-		this.m_path=temp2;
-		
 	}
-	this.successor();						/*Il y'a un manque d'optimisation reconnu dans le recalcul des listes complètes à chaque swap
+	else {
+		this.swap(index2+1, this.m_path.length-2);
+		return;
+		}
+	this.successor(index1,index2);						/*Il y'a un manque d'optimisation reconnu dans le recalcul des listes complètes à chaque swap
 	il faudrait indexer les endroits à modifier*/
-	this.predecessor();
-	this.pathIndexedByCities();
+	this.predecessor(index1,index2);
+	this.pathIndexedByCities(index1,index2);
 	}
 	
 	
@@ -1070,14 +1103,25 @@ import tsp.Instance;
 	 * @throws Exception the exception
 	 */
 	public void permutationOpti(int t1) throws Exception {
-		this.successor();
-		this.pathIndexedByCities();
 		int Koef = 11;
 		int[] liste = new int[Koef];
 		liste[0]=t1;
 		int min =-1;
 		for(int i = 1; i<Koef;i++) {
 			liste[i]=this.m_successor[liste[i-1]];
+		}
+		int index1=this.m_path_indexed_by_cities[t1];
+		int index2=this.m_path_indexed_by_cities[liste[Koef-1]];
+		if(index1>index2) {
+			this.successor(1,index2);
+			this.successor(index1,this.m_instance.getNbCities()-1);
+			this.pathIndexedByCities(0, index2);
+			this.pathIndexedByCities(index1, this.m_instance.getNbCities()-1);
+			
+		}
+		else {
+			this.successor(index1+1,index2);
+			this.pathIndexedByCities(index1, index2);
 		}
 		long dmin =0;
 		for(int g=0; g<Koef-1;g++) {
@@ -1293,7 +1337,8 @@ import tsp.Instance;
 
 	/**
 	 * Objective value path.
-	 *Donne la distance du tour actuel
+	 *Donne la distance du tour actuel, il faudrait au vue de la fréquence à laquelle est appelée la fonction optimiser 
+	 *pour ne pas avoir à tout recalculer à chaque fois.
 	 * @return the long
 	 * @throws Exception the exception
 	 */
