@@ -1,44 +1,44 @@
-ok
-3
-ok
-./../instances/d198.tsp;15801;59903;0
-ok
-3
-ok
-./../instances/d657.tsp;50721;59907;0
-ok
-3
-ok
-./../instances/eil101.tsp;629;59903;0
-ok
-3
-ok
-./../instances/eil10.tsp;159;59900;0
-ok
-3
-ok
-./../instances/eil51.tsp;426;59902;0
-ok
-3
-ok
-./../instances/kroA100.tsp;21282;59902;0
-ok
-3
-ok
-./../instances/kroA150.tsp;26525;59902;0
-ok
-3
-ok
-./../instances/kroA200.tsp;29561;59903;0
-ok
-3
-ok
-./../instances/lin318.tsp;42112;59904;0
-ok
-3
-ok
-./../instances/pcb442.tsp;52084;59907;0
-ok
-3
-ok
-./../instances/rat575.tsp;7067;59907;0
+best 0 : 15785.0
+best 1 : 15785.0
+best 2 : 15785.0
+./../instances/d198.tsp;15785;59905;0
+best 0 : 50085.0
+best 1 : 50090.0
+best 2 : 50090.0
+./../instances/d657.tsp;50085;59908;0
+best 0 : 637.0
+best 1 : 637.0
+best 2 : 637.0
+./../instances/eil101.tsp;637;59903;0
+best 0 : 159.0
+best 1 : 159.0
+best 2 : 159.0
+./../instances/eil10.tsp;159;59902;0
+best 0 : 426.0
+best 1 : 426.0
+best 2 : 426.0
+./../instances/eil51.tsp;426;59903;0
+best 0 : 21282.0
+best 1 : 21282.0
+best 2 : 21282.0
+./../instances/kroA100.tsp;21282;59911;0
+best 0 : 26525.0
+best 1 : 26525.0
+best 2 : 26525.0
+./../instances/kroA150.tsp;26525;59904;0
+best 0 : 29470.0
+best 1 : 29470.0
+best 2 : 29470.0
+./../instances/kroA200.tsp;29470;59907;0
+best 0 : 42576.0
+best 1 : 42576.0
+best 2 : 42576.0
+./../instances/lin318.tsp;42576;59907;0
+best 0 : 51698.0
+best 1 : 51698.0
+best 2 : 51698.0
+./../instances/pcb442.tsp;51698;59943;0
+best 0 : 6970.0
+best 1 : 6970.0
+best 2 : 6968.0
+./../instances/rat575.tsp;6968;59908;0

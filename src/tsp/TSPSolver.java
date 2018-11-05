@@ -1,6 +1,8 @@
 package tsp;
 
 import tsp.heuristic.AHeuristicBasic;
+import tsp.heuristic.LKH_classic;
+import tsp.heuristic.LKH_classic2;
 import tsp.metaheuristic.AMetaheuristic;
 import tsp.metaheuristic.AMetaheuristicGenetique;
 import tsp.metaheuristic.AMetaheuristicGenetiqueParallel;
@@ -94,17 +96,20 @@ public class TSPSolver {
 		int j = 0;*/
 		
 		//*Multi-thread
-		System.out.println("ok");  
-		int cores = Runtime.getRuntime().availableProcessors()-1;
-		System.out.println("" + cores);
+ 
+		int cores = Math.max(Runtime.getRuntime().availableProcessors()-1, 1); //On n'occupe pas chacuns des coeurs sous peine d'observer des ralentissements. En effet, dans le traitement de chacune des îles, la JVM effectue certaines opérations dans plusieurs threads.
+		
 		int taillePopulationEchange = 6;
-		int nbSelections = 10;
-		int taillePopulation = 20;
+		int nbSelections = Math.max((int)(30/cores), 6);
+		int taillePopulation = Math.max((int)(100/cores), 20);
 		Best best = new Best();
+		
+
 		
 		double[] p_mutation = new double[cores];
 		for(int i = 0; i < cores; i++) {
-			p_mutation[i] = 0.05 + ((0.2 - 0.05)/cores) * i;
+			//p_mutation[i] = 0.2 + ((0.2 - 0.1)/cores) * i;
+			p_mutation[i] = 0.2;
 		}
 		
 		
@@ -123,11 +128,34 @@ public class TSPSolver {
 			stockage[i + 1] = new Sync(taillePopulationEchange);
 			island[i] = new AMetaheuristicGenetiqueParallel(this.m_instance, "Modele insulaire", nbSelections, taillePopulation, p_mutation[i], stockage[i], stockage[i+1], best);
 			listeThreads[i] = new Thread(island[i]);
+			listeThreads[i].setDaemon(true);
 			
 		}
-		System.out.println("ok");
-		 island[cores - 1] = new AMetaheuristicGenetiqueParallel(this.m_instance, "Modele insulaire", nbSelections, taillePopulation, p_mutation[cores - 1], stockage[cores - 1], stockage[0], best);
+		
+		island[cores - 1] = new AMetaheuristicGenetiqueParallel(this.m_instance, "Modele insulaire", nbSelections, taillePopulation, p_mutation[cores - 1], stockage[cores - 1], stockage[0], best);
 		listeThreads[cores - 1] = new Thread(island[cores - 1]);
+		listeThreads[cores - 1].setDaemon(true);
+		
+		if(this.m_instance.getNbCities() >= 575) { //Si l'instance est trop grande, on trouve un individu se rapprochant du parcours optimal avec l'algorithme du LKH.
+					
+					LKH_classic2 lkh = new LKH_classic2(this.m_instance, "LKH");
+					lkh.solve();
+					Individu help = new Individu(this.m_instance.getNbCities(), lkh.getPath().clone(), this.m_instance);
+					help.setLongueur();
+					island[0].getPopulation().inserer(help);
+					
+					
+					Individu helpMute; //On mute l'individu trouvé pour éviter de bloquer sur un optimum local.
+					for(int i = 0; i < island.length; i++) {
+						helpMute = new Individu(this.m_instance.getNbCities(), lkh.getPath().clone(), this.m_instance);
+						helpMute.RMSMutation(1);
+						
+						island[i].getPopulation().inserer(helpMute);
+					}
+					
+					
+				}
+		
 		for(int i = 0; i < cores; i++) {
 			
 			listeThreads[i].start();
@@ -137,28 +165,13 @@ public class TSPSolver {
 		 
 		do{
 			
-			/*s = modele.solve(null);
+			//*s = modele.solve(null);
 		
 			
-			if(spentTime%1000 <= 15) {
-				//System.out.println(modele.getBest().getLongueur());
-				//System.out.println(modele.getLongueur(0) + ", " + modele.getLongueur(1) + ", " + modele.getLongueur(3));
-			}
-			j++;
-			*/
+		
 			
 			
-			//Multi-Thread
-			
-			
-			
-			/*if(best.get() != null) {
-				this.m_solution = best.get().toSolution();
-				//System.out.println("solution : " + best.get().getLongueur());
-				//this.m_solution.evaluate();
-				//System.out.println("solution :" + this.m_solution.getObjectiveValue());
-			}*/
-			
+		
 		
 		
 		
@@ -172,6 +185,8 @@ public class TSPSolver {
 		for(int i = 0; i < this.m_instance.getNbCities(); i++) {
 			this.m_solution.setCityPosition(i, s.getCity(i));
 		}
+		
+		
 		//this.m_solution = best.get().toSolution();
 		
 		/*for(int i = 0; i < this.m_instance.getNbCities(); i++) {

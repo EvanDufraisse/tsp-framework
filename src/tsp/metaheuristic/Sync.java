@@ -14,24 +14,24 @@ public class Sync {
 
 	public synchronized Individu[] get() throws InterruptedException {
 		
-		while (disponible == false) {
+		/*while (disponible == false) {
 			wait();
-			}
+			}*/
 		
 			disponible = false;
-			notifyAll();
+			//notifyAll();
 			return this.stock;
 		}
 	
 	public synchronized void put(Individu[] val) throws InterruptedException {
 		
-		while (disponible == true) {
+		/*while (disponible == true) {
 			wait();
-			}
+			}*/
 		
 			this.stock = val;
 			disponible = true;
-			notifyAll();
+			//notifyAll();
 			
 		}
 		

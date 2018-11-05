@@ -4,7 +4,7 @@ import tsp.Solution;
 
 public class Best {
 
-	private Individu val;
+	private volatile Individu val;
 	
 	
 	public Best() {

@@ -6,35 +6,75 @@ import tsp.metaheuristic.Individu;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+// TODO: Auto-generated Javadoc
 //import com.sun.deploy.util.SystemPropertyUtil;
 
+/**
+ * The Class AMetaheuristicGenetique.
+ */
 public class AMetaheuristicGenetique extends AMetaheuristic {
 	
+	/** The nb selections. */
 	private int nbSelections;
+	
+	/** The taille population. */
 	private int taillePopulation;
+	
+	/** The population. */
 	private Population population;
+	
+	/** The population selectionnee. */
 	private Population populationSelectionnee;
+	
+	/** The best. */
 	private Individu best;
+	
+	/** The iteration. */
 	private int iteration;
+	
+	/** The p mutation. */
 	private double p_mutation;
 
 	
+	/**
+	 * Instantiates a new a metaheuristic genetique.
+	 *
+	 * @param instance the instance
+	 * @param name the name
+	 * @param nbSelections the nb selections
+	 * @param taillePopulation the taille population
+	 * @param p_mutation the p mutation
+	 * @throws Exception the exception
+	 */
 	public AMetaheuristicGenetique(Instance instance, String name, int nbSelections, int taillePopulation, double p_mutation) throws Exception {
 		super(instance, name);
 		this.nbSelections = nbSelections;
 		this.taillePopulation = taillePopulation;
-		this.population = new Population(this.taillePopulation, this.m_instance.getNbCities(), this.m_instance);
-		this.populationSelectionnee = new Population(this.nbSelections, this.m_instance.getNbCities(), this.m_instance);
+		this.population = new Population(this.taillePopulation, this.m_instance);
+		this.populationSelectionnee = new Population(this.nbSelections, this.m_instance);
 		this.best = this.population.get(0);
 		this.iteration = 0;		
 		this.p_mutation = p_mutation;
 	}
 	
 	
+	/**
+	 * Gets the longueur of individual i.
+	 *
+	 * @param i the i
+	 * @return the longueur
+	 * @throws Exception the exception
+	 */
 	public double getLongueur(int i) throws Exception {
 		return this.population.get(i).getLongueur();
 	}
 	
+	/**
+	 * Gets the solution.
+	 *
+	 * @return the solution
+	 * @throws Exception the exception
+	 */
 	public Solution getSolution() throws Exception {
 		
 		Solution solution = new Solution(this.m_instance);
@@ -46,11 +86,19 @@ public class AMetaheuristicGenetique extends AMetaheuristic {
 	}
 	
 		
+	/**
+	 * Gets the best.
+	 *
+	 * @return the best
+	 */
 	public Individu getBest() {
 		return this.best;
 	}
 	
 
+	/* (non-Javadoc)
+	 * @see tsp.metaheuristic.AMetaheuristic#solve(tsp.Solution)
+	 */
 	@Override
 	public Solution solve(Solution sol) throws Exception {
 		// TODO Auto-generated method stub

@@ -8,34 +8,72 @@ import java.util.concurrent.ThreadLocalRandom;
 import tsp.Instance;
 import tsp.Solution;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Individu.
+ */
 public class Individu {
 
+	/** Le tableau représentant l'ordre de visite des villes. Par exemple : {1, 4, 2, 3, 1}. On visite la ville 1, puis la ville 4, etc... */
 	private int[] individu;
+	
+	/** Le nombre de villes que l'on doit visiter. */
 	private int size;
+	
+	/** La longueur du parcours représenté par l'individu. */
 	private double longueur;
+	
+	/** The instance. */
 	private Instance instance;
 	
-	public Individu(int n, boolean individuVide, Instance instance) {
-		this.size = n;
-		this.individu = new int[n+1];
+	/**
+	 * Instantiates a new individu.
+	 *
+	 * @param size la taille de l'individu
+	 * @param individuVide argument ajouté pour signifier que l'on veut créer un individu vide (pas de perte de temps en créant inutilement un individu aléatoire)
+	 * @param instance the instance
+	 */
+	public Individu(int size, boolean individuVide, Instance instance) {
+		this.size = size;
+		this.individu = new int[this.size + 1];
 		this.instance = instance;
 	}
 	
 	
-	public Individu(int n, Instance instance) throws Exception {
+	/**
+	 * Instantiates a new individu.
+	 *
+	 * @param size la taille de l'individu
+	 * @param instance the instance
+	 * @throws Exception the exception
+	 */
+	public Individu(int size, Instance instance) throws Exception {
 		// TODO Auto-generated constructor stub
-		this.size = n;
+		this.size = size;
 		this.individu = individuAleatoire(this.size).getIndividu();
 		this.instance = instance;
 		this.setLongueur();
 		
 	}
+	
+	/**
+	 * Créé un individu ayant pour tableau des villes celui passé en paramètre.
+	 *
+	 * @param n la taille de l'individu
+	 * @param individu the individu
+	 * @param instance the instance
+	 */
 	public Individu(int n, int[] individu, Instance instance) {
 		this.individu = individu;
 		this.size = n;
 		this.instance = instance;
 	}
 
+	/**
+	 * Créé un individu par recopie profonde.
+	 *
+	 * @param ind L'individuu que l'on veut cloner.
+	 */
 	public Individu(Individu ind) {
 		this.individu = ind.getIndividu().clone();
 		int n = ind.getSize();
@@ -50,6 +88,11 @@ public class Individu {
 	}
 	
 	
+	/**
+	 * Mute l'individu, en échangeant un nombre de villes aléatoire.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void muter() throws Exception {
 		
 		double p_mutation = 0.15; // la probabilité de mutation d'un individu
@@ -62,12 +105,18 @@ public class Individu {
 				swap(this.individu, randomWithRange(1, this.size - 1), randomWithRange(1, this.size - 1)); //On echange des ville aleatoirement choisies (sauf la premiere)
 			}
 			this.opt_2(this.instance);
-			//this.setLongueur();
+		
 		}
 		
 		
 	}
 	
+	/**
+	 * Mute l'individu par mutation RMS.
+	 *
+	 * @param p_mutation la probabilité de mutation.
+	 * @throws Exception the exception
+	 */
 	public void RMSMutation(double p_mutation) throws Exception{
 		
 		
@@ -92,6 +141,11 @@ public class Individu {
 		this.opt_2(this.instance);
 	}
 	
+	/**
+	 * 
+	 *
+	 * @return Le tableau représentant l'ordre de parcours des villes.
+	 */
 	public int[] getIndividu() {
 		return this.individu;
 				
@@ -100,24 +154,63 @@ public class Individu {
 	
 	
 	
+	/**
+	 * 
+	 *
+	 * @param min L'entier minimum que l'on veut retourner.
+	 * @param max L'entier maximum que l'on veut retourner.
+	 * @return Un entier aléatoirement choisi entre min et max inclus.
+	 */
 	int randomWithRange(int min, int max)
 	{
 	   double range = Math.abs(max - min);     
 	   return (int)(Math.random() * range) + (min <= max ? min : max);
 	}
 	
+	/**
+	 * 
+	 *
+	 * @return La taille de l'individu.
+	 */
 	public int getSize() {
 		return this.size;
 	}
+	
+	/**
+	 * 
+	 *
+	 * @param indice La place de la ville dans le parcours que l'on veut affecter.
+	 * @param elt Le numéro de la ville que l'on veut placer dans le parcours.
+	 */
 	public void set(int indice, int elt) {
 		this.individu[indice] = elt;
 	}
+	
+	/**
+	 * 
+	 *
+	 * @param i La place dans le parcours dont on veut retourner le numéro de la ville.
+	 * @return Le numéro de la ville qui a la place i dans le parcours.
+	 */
 	public int get(int i) {
 		return this.individu[i];
 	}
+	
+	/**
+	 * Gets the instance of Individu.
+	 *
+	 * @return the instance of Individu
+	 */
 	public Instance getInstance() {
 		return this.instance;
 	}
+	
+	/**
+	 * 
+	 *
+	 * @param Le numéro de la ville.
+	 * @return true si la ville elt est dans l'individu, false sinon.
+	 */
 	public boolean contains(int elt) {
 	
 		for(int i = 0; i < this.getSize(); i++) {
@@ -134,9 +227,10 @@ public class Individu {
 	 * Ajoute ensuite les allèles du parent2 si ils ne sont pas déjà
 	 * présents dans le fils, auquel cas on essaye d'ajouter l'allèle
 	 * suivant.
+	 *
 	 * @param parent2 l'individu avec lequel on croise l'individu sur lequel on applique croiser
 	 * @return un individu issu du croisement des deux parents
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	public Individu croiser (Individu parent2) throws Exception {
 		
@@ -165,6 +259,13 @@ public class Individu {
 		//System.out.println(fils.ecrire());
 		return fils;
 	}
+	
+	/**
+	 * OX crossover.
+	 *
+	 * @param parent2 L'individu avec lequel on veut croiser this.
+	 * @return l'individu résultant du croisement dit "OX crossover" entre this et parent2.
+	 */
 	public Individu OXCrossover(Individu parent2) {
 		
 		int n = this.getSize();
@@ -220,6 +321,13 @@ public class Individu {
 		
 		return fils;
 	}
+	
+	/**
+	 * Applique l'algorithme du 2-opt à l'individu.
+	 *
+	 * @param instance the instance
+	 * @throws Exception the exception
+	 */
 	public void opt_2(Instance instance) throws Exception {
 		int n = this.getSize();
 		
@@ -246,7 +354,8 @@ public class Individu {
 	
 	
 	/**
-	 * Echange les elements de a situés aux places i et j
+	 * Echange les elements de a situés aux places i et j.
+	 *
 	 * @param a un tableau d'entiers représentant un individu
 	 * @param i un indice quelconque du tableau
 	 * @param j un indice quelconque du tableau
@@ -256,8 +365,10 @@ public class Individu {
 		  a[i] = a[j];
 		  a[j] = t;
 		}
+	
 	/**
-	 * Echange les segments [i; i + 1] et [j; j + 1]
+	 * Echange les segments [i; i + 1] et [j; j + 1].
+	 *
 	 * @param i une ville du parcours
 	 * @param j une ville du parcours
 	 */
@@ -270,6 +381,13 @@ public class Individu {
 		}
 		
 	}
+	
+	/**
+	 * Echange les villes situées aux places i et j.
+	 *
+	 * @param i la place de la ville que l'on veut échanger avec celle d'indice j.
+	 * @param j la place de la ville que l'on veut échanger avec celle d'indice i.
+	 */
 	public void swapInd(int i, int j) {
 		int t = this.individu[i];
 		this.individu[i] = this.individu[j];
@@ -280,7 +398,8 @@ public class Individu {
 	 * Créé un individu aléatoire (c'est-à-dire un tableau d'entiers
 	 * choisis aléatoirement entre 1 et n) et apparaissant une et une
 	 * seule fois.
-	 * 
+	 *
+	 * @param n the n
 	 * @return individu solution aléatoirement choisi
 	 */
 	public Individu individuAleatoire(int n) {
@@ -305,6 +424,11 @@ public class Individu {
 		return new Individu(n, individuAlea, this.instance);
 	}
 	
+	/**
+	 * Recalcule la longueur de l'individu.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void setLongueur() throws Exception {
 		
 		double longueurTemp = 0;
@@ -314,14 +438,30 @@ public class Individu {
 		}
 		this.longueur = longueurTemp;
 	}
+	
+	/**
+	 * Change la longueur de l'individu en lon.
+	 *
+	 * @param lon la longueur que l'on veut affecter à l'individu.
+	 */
 	public void setLongueur(double lon) {
 		this.longueur = lon;
 	}
 	
+	/**
+	 * 
+	 *
+	 * @return La longueur de l'individu.
+	 */
 	public double getLongueur() {
 		return this.longueur;
 	}
 	
+	/**
+	 *
+	 *
+	 * @return Une chaine de caractères correspondant à la concaténation des numéros des villes dans l'ordre de parcours.
+	 */
 	public String ecrire() {
 		String s = "";
 		for(int i = 0; i <= this.size; i++) {
@@ -330,7 +470,13 @@ public class Individu {
 		
 		return s;
 	}
-	public int getMax() {
+	
+	/**
+	 * Gets the max.
+	 *
+	 * @return the 
+	 */
+	/*public int getMax( {
 		int max = 0;
 		for (int i = 0; i < this.getIndividu().length; i++) {
 			if(this.getIndividu()[i] > max) {
@@ -339,7 +485,14 @@ public class Individu {
 		}
 		
 		return max;
-	}
+	}*/
+	
+	/**
+	 * 
+	 *
+	 * @return Un objet Solution correspondant à l'individu.
+	 * @throws Exception the exception
+	 */
 	public Solution toSolution() throws Exception {
 		
 	Solution solution = new Solution(this.instance);

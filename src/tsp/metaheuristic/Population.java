@@ -9,14 +9,30 @@ import com.sun.tools.javac.util.List;
 import tsp.Instance;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Population.
+ */
 public class Population {
 
 	
+	/** Le tableau contenant les individus de la population */
 	private ArrayList<Individu> population;
+	
+	/** Le nombre d'individus de la population. */
 	private int nbIndividus;
+	
+	/** The instance. */
 	private Instance instance;
 	
-	public Population(int nbIndividus, int nbVilles, Instance instance) throws Exception {
+	/**
+	 * Instantiates a new population.
+	 *
+	 * @param nbIndividus
+	 * @param instance
+	 * @throws Exception
+	 */
+	public Population(int nbIndividus, Instance instance) throws Exception {
 		
 		this.nbIndividus = nbIndividus;
 		this.population = new ArrayList<Individu>();
@@ -24,27 +40,56 @@ public class Population {
 		
 		for(int i = 0; i < nbIndividus; i++) {
 			
-			this.population.add(new Individu(nbVilles, this.instance));
+			this.population.add(new Individu(instance.getNbCities(), this.instance));
 			
 		}
 		
 	}
+	
+	/**
+	 * Instantiates a new population.
+	 *
+	 * @param population the population
+	 * @param nbIndividus the nb individus
+	 * @param instance the instance
+	 */
 	public Population(ArrayList<Individu> population, int nbIndividus, Instance instance) {
 		this.population = population;
 		this.nbIndividus = nbIndividus;
 		this.instance = instance;
 	}
 	
+	/**
+	 * 
+	 *
+	 * @param i La place dans la population de l'individu que l'on veut retourner.
+	 * @return L'individu situé à la place i dans la population.
+	 */
 	public Individu get(int i) {
 		return this.population.get(i);
 	}
+	
+	/**
+	 * 
+	 *
+	 * @return Le nombre d'individus de la population.
+	 */
 	public int getNbIndividus() {
 		return this.nbIndividus;
 	}
+	
+	/**
+	 * 
+	 *
+	 * @return Le tableau regroupant les individus de la population.
+	 */
 	public ArrayList<Individu> getPopulation(){
 		return this.population;
 	}
 	
+	/**
+	 * Trie les individus de la population par ordre croissant du parcours qu'ils représentent.
+	 */
 	public void trier() {
 		
 	
@@ -85,11 +130,13 @@ public class Population {
 	
 
 }
+	
 	/**
 	 * Insère chacun des individus dans la population this, de telle manière que this garde la même taille, et que la population résultante soit meilleure. On insère donc
 	 * seulement les individus dont la longueur est inférieure à celle de l'individu ayant la plus grande.
+	 *
 	 * @param pop La population à fusionner avec this
-	 * @throws Exception
+	 * @throws Exception the exception
 	 */
 	public void fusionner(Population pop) throws Exception {
 		
@@ -102,10 +149,12 @@ public class Population {
 		}
 
 	}
+	
 	/**
 	 * Insère ind dans this, de telle manière à garder un ordre croissant de longueur dans le tableau this.population, et seulement si sa longueur est inférieure à la pire de la population.
+	 *
 	 * @param ind l'individu que l'on veut insérer dans this
-	 * @throws Exception
+	 * @throws Exception the exception
 	 */
 	public void inserer(Individu ind) throws Exception {
 		
@@ -114,8 +163,11 @@ public class Population {
 	
 	/**
 	 * Insère ind dans this, de telle manière à garder un ordre croissant de longueur dans le tableau this.population, et seulement si sa longueur est inférieure à la pire de la population.
+	 *
 	 * @param ind l'individu que l'on veut insérer dans this
-	 * @throws Exception
+	 * @param start the start
+	 * @return the int
+	 * @throws Exception the exception
 	 */
 	public int inserer(Individu ind, int start) throws Exception{
 		
@@ -136,9 +188,12 @@ public class Population {
 			return 0;
 		}
 	}
+	
 	/**
 	 * Mute chacun des individus de this, avec une certaine probabilité, contenue dans Individu.muter()
-	 * @throws Exception
+	 *
+	 * @param p_mutation the p mutation
+	 * @throws Exception the exception
 	 */
 	public void muter(double p_mutation) throws Exception {
 		
@@ -162,6 +217,9 @@ public class Population {
 	
 	
 	
+	/**
+	 * Selectionner.
+	 */
 	public void selectionner() {
 		
 		
@@ -171,8 +229,9 @@ public class Population {
 	}
 	
 	/**
-	 * Applique l'heuristique 2-opt à tous les individus
-	 * @throws Exception
+	 * Applique l'heuristique 2-opt à tous les individus.
+	 *
+	 * @throws Exception the exception
 	 */
 	public void opt2() throws Exception {
 		int n = this.nbIndividus;
@@ -182,19 +241,23 @@ public class Population {
 		}
 		this.trier();
 	}
+	
 	/**
-	 * 
+	 *
+	 *
 	 * @return le tableau des individus de this
 	 */
-	public ArrayList<Individu> get() {
+	/*public ArrayList<Individu> get() {
 		return this.population;
-	}
+	}*/
+	
 	/**
-	 * 
+	 * Selectionner croiser.
+	 *
 	 * @param nbIndividusSelectionnes le nombre d'individus que l'on veut croiser entre eux
-	 * @param instance
+	 * @param instance the instance
 	 * @return une population constituée des nbIndividusSelectionnes meilleurs individus
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	public Population selectionnerCroiser(int nbIndividusSelectionnes, Instance instance) throws Exception {
 		//this.trier();
@@ -208,6 +271,14 @@ public class Population {
 		return new Population(selection, nbIndividusSelectionnes, this.instance);
 			
 		}
+	
+	/**
+	 * Selection aleatoire croiser.
+	 *
+	 * @param nbIndividusSelectionnes the nb individus selectionnes
+	 * @return the population
+	 * @throws Exception the exception
+	 */
 	public Population selectionAleatoireCroiser(int nbIndividusSelectionnes) throws Exception {
 		
 		ArrayList<Individu> selection = new ArrayList<Individu>();
@@ -224,12 +295,18 @@ public class Population {
 		
 		
 	}
+	
+	/**
+	 * Supprime des individus de la population, de telle sorte que tous les individus aient une longueur différente.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void enleverDoublons() throws Exception {
 	
 		for(int i = 0; i < this.nbIndividus; i++) {
 			int j = i + 1;
 			while(j < this.nbIndividus && this.get(i).getLongueur() == this.get(j).getLongueur()) {
-			
+				//while(j < this.nbIndividus && Math.abs(this.get(i).getLongueur() - this.get(j).getLongueur()) <= 4) {
 		
 					this.population.set(j, new Individu(this.get(j).getSize(), this.instance));
 					j++;
@@ -238,11 +315,23 @@ public class Population {
 		}
 		this.trier();
 	}
+		
+		/**
+		 *
+		 *
+		 * @param min L'entier minimum que l'on souhaite retourner.
+		 * @param max L'entier maximum que l'on souhaite retourner.
+		 * @return Un entier choisi aléatoirement entre min et max inclus.
+		 */
 		int randomWithRange(int min, int max)
 	{
 	   double range = Math.abs(max - min);     
 	   return (int)(Math.random() * range) + (min <= max ? min : max);
 	}
+	
+	/* 
+	 * @return Une chaine de caratère issue de la concaténation des longueurs des individus stockés dans la population.
+	 */
 	public String toString() {
 		int n = this.population.size();
 		String s = "[";
